@@ -1,0 +1,21 @@
+\chapter{Source Code Listings}
+\label{app:code}
+
+This appendix contains core implementation scripts for data processing and analysis.
+
+\begin{lstlisting}[language=Python, caption={Data Collection and Preprocessing Script}]
+import numpy as np
+
+def calculate_metrics(data_array):
+    """
+    Calculate summary statistics for experimental readings.
+    """
+    mean_val = np.mean(data_array)
+    std_val = np.std(data_array)
+    return {"mean": mean_val, "std": std_val}
+
+if __name__ == "__main__":
+    readings = np.array([12.4, 14.2, 11.9, 13.5, 12.8])
+    stats = calculate_metrics(readings)
+    print(f"Calculated Stats: {stats}")
+\end{lstlisting}

@@ -1,0 +1,151 @@
+\documentclass[11pt,a4paper]{report}
+
+% ==========================================
+% PACKAGES & SETUP
+% ==========================================
+
+% Page Geometry & Margins
+\usepackage[margin=1in]{geometry}
+
+% Typography & Fonts
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{setspace}
+\onehalfspacing % 1.5 line spacing for technical report readability
+
+% Graphics & Figures
+\usepackage{graphicx}
+\graphicspath{{figures/}} % Default search path for images
+\usepackage{caption}
+\usepackage{subcaption}
+
+% Tables
+\usepackage{booktabs}   % Publication quality tables (\toprule, \midrule, \bottomrule)
+\usepackage{tabularx}   % Flexible column width tables
+\usepackage{multirow}   % Multi-row cells
+
+% Mathematics
+\usepackage{amsmath, amsfonts, amssymb}
+
+% Hyperlinks & PDF Metadata
+\usepackage{xcolor}
+\definecolor{navyblue}{RGB}{0, 51, 102}
+\definecolor{linkblue}{RGB}{31, 78, 121}
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=navyblue,
+    citecolor=navyblue,
+    urlcolor=linkblue,
+    pdftitle={Engineering Technical Report},
+    pdfauthor={Author Name},
+    pdfsubject={Technical Engineering Analysis},
+    pdfkeywords={LaTeX, Engineering Report, IEEE}
+}
+
+% Headers & Footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\leftmark}
+\fancyhead[R]{\small Engineering Technical Report}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Section Title Formatting
+\usepackage{titlesec}
+\titleformat{\chapter}[hang]{\normalfont\huge\bfseries\color{navyblue}}{\thechapter.}{0.5em}{}
+\titlespacing*{\chapter}{0pt}{-10pt}{15pt}
+
+% IEEE Citation & Bibliography Setup
+\usepackage[
+    backend=biber,
+    style=ieee,
+    sorting=none
+]{biblatex}
+\addbibresource{references.bib}
+
+% Code Listings Formatting (For Appendices)
+\usepackage{listings}
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    keywordstyle=\color{navyblue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{darkgray}
+}
+
+% ==========================================
+% DOCUMENT METADATA
+% ==========================================
+\title{
+    \vspace{-1.5cm}
+    \Huge \textbf{\color{navyblue} Technical Engineering Report} \\[0.4cm]
+    \large \textbf{Project Title / Subtitle} \\[1cm]
+}
+
+\author{
+    \textbf{Prepared by:} \\
+    Author Name \\
+    \small Student ID / Employee ID: 12345678 \\
+    \small Department of Engineering \\[0.5cm]
+    \textbf{Prepared for:} \\
+    Organization / Course Name \\
+    Instructor / Manager Name
+}
+
+\date{\today}
+
+% ==========================================
+% DOCUMENT BODY
+% ==========================================
+\begin{document}
+
+% --- TITLE PAGE ---
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+% --- ROMAN NUMERAL PAGE NUMBERING FOR PRELIMINARIES ---
+\pagenumbering{roman}
+
+% --- EXECUTIVE SUMMARY ---
+\include{sections/00_executive_summary}
+\newpage
+
+% --- TABLE OF CONTENTS & LISTS ---
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+\newpage
+
+% --- ARABIC PAGE NUMBERING FOR MAIN CONTENT ---
+\pagenumbering{arabic}
+
+% --- SECTIONS ---
+\include{sections/01_introduction}
+\include{sections/02_background}
+\include{sections/03_methodology}
+\include{sections/04_results_analysis}
+\include{sections/05_discussion}
+\include{sections/06_conclusion}
+
+% --- REFERENCES ---
+\newpage
+\printbibliography[heading=bibintoc, title={References}]
+
+% --- APPENDICES ---
+\newpage
+\appendix
+\include{appendices/appendix_a_code}
+\include{appendices/appendix_b_data}
+
+\end{document}
