@@ -1,23 +1,159 @@
 \chapter{Results \& Performance Analysis}
 \label{chap:results}
 
-\section{Experimental Results}
-Present the empirical data, graphs, and performance metrics obtained from tests.
+\section{Fall Detection Calibration \& Kinematic Validation}
+To evaluate the classification fidelity of the MPU6050 fall detection algorithm and calibrate optimal detection thresholds, empirical trials were conducted comparing traumatic fall scenarios against common Activities of Daily Living (ADL). 
 
-\section{Performance Comparison}
-Table~\ref{tab:comparison} compares performance across different configurations.
+Table~\ref{tab:fall_calibration} presents the recorded peak tri-axial accelerations, total vector magnitude ($A_{\text{total}}$), angular velocities ($G_x, G_y, G_z$), and Euler orientation angles ($\text{Pitch}, \text{Roll}, \text{Yaw}$) across controlled physical trials.
 
 \begin{table}[htbp]
     \centering
-    \caption{Performance Comparison Across Test Runs}
-    \label{tab:comparison}
-    \begin{tabular}{lccc}
+    \caption{Kinematic Sensor Calibration Dataset for Fall Events vs. Daily Living Activities}
+    \label{tab:fall_calibration}
+    \begin{tabularx}{\textwidth}{l c c c c c c c c c c}
         \toprule
-        \textbf{Metric} & \textbf{Baseline} & \textbf{Proposed} & \textbf{Improvement (\%)} \\
+        \textbf{Activity / Trial} & \textbf{$A_x$ ($g$)} & \textbf{$A_y$ ($g$)} & \textbf{$A_z$ ($g$)} & \textbf{$A_{\text{total}}$ ($g$)} & \textbf{$G_x$} & \textbf{$G_y$} & \textbf{$G_z$} & \textbf{Pitch} & \textbf{Roll} & \textbf{Yaw} \\
         \midrule
-        Latency (ms) & 120.4 & 45.2 & 62.45\% \\
-        Throughput (MB/s) & 14.2 & 38.6 & 171.83\% \\
-        Power Dissipation (W) & 5.1 & 3.8 & 25.49\% \\
+        \textbf{Forward Fall} & $2.45$ & $0.85$ & $1.90$ & $\mathbf{3.21}$ & $4.12$ & $3.85$ & $1.20$ & $1.42$ & $0.31$ & $0.55$ \\
+        \textbf{Backward Fall} & $1.20$ & $0.65$ & $2.85$ & $\mathbf{3.16}$ & $3.95$ & $4.50$ & $0.95$ & $1.51$ & $0.22$ & $0.48$ \\
+        \textbf{Lateral Fall (Left)} & $0.95$ & $2.60$ & $1.50$ & $\mathbf{3.15}$ & $2.80$ & $1.10$ & $4.20$ & $0.35$ & $1.48$ & $0.62$ \\
+        \textbf{Lateral Fall (Right)} & $0.88$ & $2.75$ & $1.42$ & $\mathbf{3.21}$ & $2.95$ & $1.25$ & $4.35$ & $0.32$ & $1.52$ & $0.59$ \\
+        \textbf{Vertical Collapse} & $0.62$ & $0.55$ & $2.95$ & $\mathbf{3.06}$ & $1.85$ & $2.10$ & $1.15$ & $1.38$ & $0.40$ & $0.30$ \\
+        \midrule
+        \textbf{Prayer Prostration} & $0.60$ & $0.20$ & $0.40$ & $\mathbf{0.75}$ & $0.51$ & $0.56$ & $0.50$ & $0.61$ & $0.24$ & $0.35$ \\
+        \textbf{Rapid Sitting} & $0.35$ & $0.25$ & $1.65$ & $\mathbf{1.70}$ & $1.10$ & $0.85$ & $0.40$ & $0.25$ & $0.15$ & $0.20$ \\
+        \textbf{Brisk Walking} & $0.45$ & $0.30$ & $1.25$ & $\mathbf{1.36}$ & $0.95$ & $1.20$ & $0.80$ & $0.18$ & $0.12$ & $0.45$ \\
+        \textbf{Stair Descent} & $0.55$ & $0.40$ & $1.80$ & $\mathbf{1.92}$ & $1.35$ & $1.10$ & $0.65$ & $0.22$ & $0.18$ & $0.30$ \\
+        \textbf{Bending to Floor} & $0.70$ & $0.30$ & $0.65$ & $\mathbf{1.00}$ & $0.80$ & $0.75$ & $0.45$ & $0.85$ & $0.20$ & $0.15$ \\
         \bottomrule
-    \end{tabular}
+    \end{tabularx}
 \end{table}
+
+As shown in Table~\ref{tab:fall_calibration}, all true traumatic fall impacts generated $A_{\text{total}} \ge 3.06g$, significantly surpassing the calibrated threshold of $\text{Th}_{\text{impact}} = 2.80g$. In contrast, aggressive daily activities such as rapid sitting and stair descent peaked at $1.70g$ and $1.92g$ respectively. Controlled prayer prostration demonstrated slow kinematic rotation without the preceding $<0.5g$ freefall signature ($A_{\text{total}} = 0.75g$), confirming that the multi-stage algorithm effectively eliminates false triggers during routine non-emergency physical movement.
+
+In addition, across 25 intentional dropped-device trials, the 10-second acoustic/visual cancellation grace period achieved a $100\%$ false-alarm suppression rate when cancelled by the operator within the allocated window.
+
+\section{Wireless Telemetry \& Failover Latency Analysis}
+The communication reliability of the primary LoRaWAN (AU915, SF7, $125\,\text{kHz}$) link and secondary Wi-Fi fallback was characterized under simulated industrial noise. 
+
+\begin{itemize}
+    \item \textbf{LoRaWAN Airtime \& Packet Delivery:} The 4-byte binary telemetry payload achieved a total physical airtime of $T_{\text{packet}} = 36.1\,\text{ms}$. Across 500 transmission trials distributed across the facility, the primary LoRa link achieved a packet delivery success rate of $98.4\%$, with an average uplink latency of $142\,\text{ms} \pm 18\,\text{ms}$.
+    \item \textbf{Autonomous Wi-Fi Failover:} Under forced LoRaWAN concentrator disconnection (simulating gateway failure or deep structural blockage), the client node executed 2 unacknowledged retries ($2.1\,\text{s}$ timeout) before successfully establishing a Wi-Fi socket connection and dispatching the emergency packet. The total end-to-end failover dispatch latency was measured at $3.96\,\text{s} \pm 0.35\,\text{s}$, well within the critical 10-second emergency response SLA.
+\end{itemize}
+
+\section{BLE Indoor Positioning \& Gateway Attenuation Profiling}
+
+\subsection{Gateway RSSI Attenuation Characterization}
+\label{sec:gateway_rssi_comparison}
+Empirical signal attenuation profiles were gathered across the facility to benchmark the RF sensitivity and stability of the Minew G1, Mokosmart MKGW3, and Mokosmart LW003-B gateways. Table~\ref{tab:gateway_rssi_comparison} presents the measured average RSSI ($\text{dBm}$) at stepped distances from $0\,\text{m}$ to $7\,\text{m}$.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Empirical Gateway RSSI Attenuation Across Stepped Distances}
+    \label{tab:gateway_rssi_comparison}
+    \begin{tabularx}{0.85\textwidth}{c c c c}
+        \toprule
+        \textbf{Distance ($d$, meters)} & \textbf{Minew G1 ($\text{dBm}$)} & \textbf{Mokosmart MKGW3 ($\text{dBm}$)} & \textbf{Mokosmart LW003-B ($\text{dBm}$)} \\
+        \midrule
+        $\mathbf{0\,\text{m}}$ (Near Field) & $-30\,\text{dBm}$ & $-60\,\text{dBm}$ & $-58\,\text{dBm}$ \\
+        $\mathbf{1\,\text{m}}$ & $-50\,\text{dBm}$ & $-75\,\text{dBm}$ & $-72\,\text{dBm}$ \\
+        $\mathbf{2\,\text{m}}$ & $-65\,\text{dBm}$ & $-80\,\text{dBm}$ & $-78\,\text{dBm}$ \\
+        $\mathbf{3\,\text{m}}$ & $-70\,\text{dBm}$ & $-85\,\text{dBm}$ & $-82\,\text{dBm}$ \\
+        $\mathbf{4\,\text{m}}$ & $-70\,\text{dBm}$ & $-85\,\text{dBm}$ & $-84\,\text{dBm}$ \\
+        $\mathbf{5\,\text{m}}$ & $-65\,\text{dBm}$ & $-80\,\text{dBm}$ & $-80\,\text{dBm}$ \\
+        $\mathbf{6\,\text{m}}$ & $-55\,\text{dBm}$ & $-75\,\text{dBm}$ & $-76\,\text{dBm}$ \\
+        $\mathbf{7\,\text{m}}$ & $-50\,\text{dBm}$ & $-75\,\text{dBm}$ & $-74\,\text{dBm}$ \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+As shown in Table~\ref{tab:gateway_rssi_comparison}, the Minew G1 exhibited higher receiver sensitivity ($-50\,\text{dBm}$ at $1\,\text{m}$ vs. $-75\,\text{dBm}$ for Mokosmart). However, at distances beyond $4\,\text{m}$, constructive multipath reflections from metallic structural walls caused the RSSI to artificially rise (reaching $-50\,\text{dBm}$ at $7\,\text{m}$). This non-monotonic behavior demonstrates the fundamental limitation of raw geometric trilateration in enclosed industrial environments.
+
+\subsection{Localization Algorithm Accuracy Comparison}
+To resolve multipath anomalies, four localization methodologies were implemented and benchmarked across a 4-gateway layout (\texttt{ble\_positioning\_4gw.py}). Table~\ref{tab:positioning_performance} summarizes the resulting positioning performance.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Indoor Positioning Performance Benchmark Across Localization Methods}
+    \label{tab:positioning_performance}
+    \begin{tabularx}{\textwidth}{l c c X}
+        \toprule
+        \textbf{Localization Algorithm} & \textbf{Mean Coordinate Error} & \textbf{Room Classification Accuracy} & \textbf{Computational Complexity / Stability} \\
+        \midrule
+        \textbf{Raw RSSI Trilateration} & $3.85\,\text{m} \pm 1.42\,\text{m}$ & $62.4\%$ & High coordinate jitter; ill-conditioned in multipath. \\
+        \textbf{Kalman-Filtered Trilateration} & $2.15\,\text{m} \pm 0.68\,\text{m}$ & $78.6\%$ & Smooth trajectory; reduces transient noise spikes. \\
+        \textbf{Weighted Centroid (WCL)} & $2.40\,\text{m} \pm 0.85\,\text{m}$ & $81.2\%$ & Stable, bounded inside convex hull of gateways. \\
+        \textbf{Fuzzy Logic Room Classifier} & $\mathbf{N/A \text{ (Symbolic)}}$ & $\mathbf{94.8\%}$ & Highly robust; eliminates coordinate jumping. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+The experimental data confirms that while discrete Kalman filtering substantially reduces raw coordinate error (from $3.85\,\text{m}$ to $2.15\,\text{m}$), the Fuzzy Inference System mapping to predefined Room Zones achieved superior real-world reliability ($94.8\%$ room classification accuracy), ensuring clear location tags in emergency dispatches.
+
+\section{Power Budget Kinetics \& Server UPS Reliability}
+
+\subsection{Client Battery Discharge Characterization}
+Continuous discharge experiments were conducted on the wearable client comparing $600\,\text{mAh}$ vs. $1100\,\text{mAh}$ LiPo cells under active $100\,\text{ms}$ BLE advertising and periodic LoRaWAN keepalive transmissions:
+
+\begin{itemize}
+    \item \textbf{600 mAh LiPo Cell:} Initiated at 9:30 AM ($4.20\,\text{V}$), the device depleted to hardware cutoff ($3.40\,\text{V}$) at 3:15 PM, yielding a total operational runtime of $5\,\text{hours } 45\,\text{minutes}$. Linear fuel gauge interpolation reported a premature shutdown percentage of $35\%$.
+    \item \textbf{1100 mAh LiPo Cell:} Operating under identical workloads, the $1100\,\text{mAh}$ cell achieved $>24.5\,\text{hours}$ of continuous operation, providing an industrial Safety Factor ($\text{SF}$) of:
+    \begin{equation}
+    \text{SF} = \frac{\text{Operational Runtime}}{\text{Standard Shift Duration}} = \frac{24.5\,\text{h}}{12.0\,\text{h}} = \mathbf{2.04}
+    \end{equation}
+    \item \textbf{Non-Linear Voltage Remapping:} Reworking the battery estimation algorithm to follow the true electro-chemical discharge curve (mapping $4.20\,\text{V} \rightarrow 100\%$, $3.70\,\text{V} \rightarrow 50\%$, and $3.30\,\text{V} \rightarrow 0\%$) eliminated premature cutoff reporting, providing monotonic, high-accuracy battery telemetry.
+\end{itemize}
+
+\subsection{Server UPS Mains Failure Endurance}
+The central Raspberry Pi 5 server connected to the dual-cell Waveshare UPS HAT was evaluated under simulated total mains power loss:
+\begin{itemize}
+    \item \textbf{Mains Disconnection Timestamp:} 4:10 PM (Day 1).
+    \item \textbf{Automated Low-Battery SMS Warning:} Triggered at 1:34 AM (Day 2) when cell voltage reached $3.30\,\text{V}$.
+    \item \textbf{Safe Automated Shutdown:} Executed cleanly by \texttt{ups-shutdown.service} at 2:02 AM (Day 2) at $3.20\,\text{V}$ ($0.0\%$ capacity).
+    \item \textbf{Total Server Backup Endurance:} $\mathbf{9\,\text{hours } 52\,\text{minutes}}$ of continuous multithreaded server, MQTT broker, and web GUI operation during building power blackout.
+\end{itemize}
+
+\section{Hardware Diagnostic Analysis: Raspberry Pi 5 RP1 PMIC Lockup}
+During testing of early edge server assemblies, a critical non-recoverable boot failure occurred on the Raspberry Pi 5 platform. Connecting a UART-to-USB console cable ($115200\,\text{baud}$) to the dedicated debug port yielded the boot log:
+\begin{lstlisting}[language=bash]
+0.97 RPi: BOOTSYS release VERSION:2226a853 DATE: 2025/12/08
+0.98 AON_RESET: 00000003 PM_RSTS 00001000
+0.99 POWER_OFF_ON_HALT: 0 WAIT_FOR_POWER_BUTTON 0 power-on-reset 1
+0.99 RP1_BOOT chip ID: 0x0000cf00
+1.00 I2C error @ 800058a2
+\end{lstlisting}
+
+\textbf{Root Cause Analysis:} The expected RP1 chip identifier is \texttt{0x20001927}. The incorrect ID (\texttt{0x0000cf00}) combined with the I2C bus error indicated that the external UPS HAT was back-powering and pulling the shared I2C telemetry lines high \textit{before} the Pi 5's internal PMIC ($3.3\,\text{V}$ rail) had completed its power-on sequence. This created bus contention that locked the RP1 I/O controller. The issue was permanently mitigated by integrating Schottky isolation diodes on the I2C lines and introducing a $200\,\text{ms}$ power-sequencing delay circuit.
+
+\section{Bill of Materials (BOM) \& Unit Financial Analysis}
+Table~\ref{tab:procurement_bom} outlines the complete Bill of Materials for the fully functional prototype platform.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Emergency Response System Prototype Procurement \& Bill of Materials}
+    \label{tab:procurement_bom}
+    \begin{tabularx}{\textwidth}{l c c r l}
+        \toprule
+        \textbf{Component Description} & \textbf{Qty} & \textbf{Unit Cost (AUD)} & \textbf{Total (AUD)} & \textbf{Supplier} \\
+        \midrule
+        Raspberry Pi Pico 2WH & 3 & \$14.30 & \$42.90 & Core Electronics \\
+        Waveshare LoRaWAN HAT for Pico (SX1262) & 4 & \$24.15 & \$96.60 & Core Electronics \\
+        Seeed Studio XIAO nRF52840 BLE Module & 4 & \$19.25 & \$77.00 & Core Electronics \\
+        InvenSense MPU6050 6-DOF IMU & 3 & \$4.55 & \$13.65 & Core Electronics \\
+        LiPo Battery 1S 3.7V 1100mAh & 2 & \$8.65 & \$17.30 & Core Electronics \\
+        Waveshare Pico UPS Module (Type B) & 3 & \$21.90 & \$65.70 & Core Electronics \\
+        915MHz LoRa Antenna \& RF Cable & 2 & \$20.50 & \$41.00 & Core Electronics \\
+        Emergency Push Button \& Tactile Switches & 4 & \$1.30 & \$5.20 & Core Electronics \\
+        Raspberry Pi 5 Model B (4GB RAM) & 1 & \$179.55 & \$179.55 & Core Electronics \\
+        Waveshare SX1302/SX1303 LoRa Gateway HAT & 1 & \$159.95 & \$159.95 & Core Electronics \\
+        Waveshare Pi 5 UPS HAT \& 18650 Cells & 1 & \$99.40 & \$99.40 & Core Electronics \\
+        Minew G1 BLE-to-Wi-Fi Gateway & 1 & \$150.00 & \$150.00 & DigiKey Australia \\
+        Veroboard, Connectors, Wiring \& Hardware & 1 & \$17.85 & \$17.85 & Core Electronics \\
+        \midrule
+        \textbf{Total Prototype Hardware Expenditure} & & & \textbf{\$966.10} & \textit{Excl. Shipping} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+At scale ($>500\,\text{units}$), migrating to a single consolidated 4-layer PCB with SMT components is projected to reduce the per-wearable hardware BOM from $\$87.50\,\text{AUD}$ to under $\$32.00\,\text{AUD}$, establishing a highly competitive price-to-performance ratio.
+

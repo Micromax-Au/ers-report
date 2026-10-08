@@ -1,20 +1,96 @@
-\chapter{Supplementary Data \& Calibration}
+\chapter{Supplementary Engineering Data \& Hardware Schematics}
 \label{app:data}
 
-This appendix provides supplementary sensor calibration matrices and raw measurement logs.
+This appendix provides supplementary hardware configuration parameters, gateway network mappings, and database DDL schemas.
 
-\section{Sensor Calibration Parameters}
+\section{BLE Gateway Network Topology \& MAC Allocations}
+Table~\ref{tab:gateway_network_config} details the network static IP and MAC address allocations configured on the Micromax facility testbed.
+
 \begin{table}[htbp]
     \centering
-    \caption{Raw Calibration Offsets}
-    \label{tab:raw_calibration}
-    \begin{tabular}{ccc}
+    \caption{BLE Gateway Network Topology Configurations}
+    \label{tab:gateway_network_config}
+    \begin{tabularx}{\textwidth}{l c c X}
         \toprule
-        \textbf{Sensor ID} & \textbf{Zero Offset (mV)} & \textbf{Gain Scale Factor} \\
+        \textbf{Gateway Node} & \textbf{MAC Address} & \textbf{Static IP Address} & \textbf{Physical Placement / Room} \\
         \midrule
-        SNS-01 & +0.42 & 1.002 \\
-        SNS-02 & -0.15 & 0.998 \\
-        SNS-03 & +0.08 & 1.001 \\
+        \textbf{Minew G1 -- GW1} & \texttt{AC:23:3F:C2:59:32} & \texttt{192.168.115.240} & Main Engineering Office (Ceiling Anchor 1) \\
+        \textbf{Minew G1 -- GW2} & \texttt{AC:23:3F:C2:6E:CB} & \texttt{192.168.115.241} & Boardroom / Meeting Space (Anchor 2) \\
+        \textbf{Minew G1 -- GW3} & \texttt{AC:23:3F:C2:6E:CC} & \texttt{192.168.115.242} & Kitchen / Breakout Area (Anchor 3) \\
+        \textbf{Mokosmart MKGW3} & \texttt{D4:36:39:1A:45:B1} & \texttt{192.168.115.243} & R\&D Prototype Testing Bay (PoE Anchor 4) \\
+        \textbf{Edge Server Broker}& \texttt{B8:27:EB:A4:91:20} & \texttt{192.168.115.49} & Central Server Rack (Port 1883 / 5000) \\
         \bottomrule
-    \end{tabular}
+    \end{tabularx}
 \end{table}
+
+\section{Client Microcontroller Hardware Pinout Mapping}
+Table~\ref{tab:pico_pinout} outlines the physical GPIO pin allocations for the Raspberry Pi Pico 2WH wearable client node.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Raspberry Pi Pico 2WH Wearable Client Pinout Configuration}
+    \label{tab:pico_pinout}
+    \begin{tabularx}{\textwidth}{l c l X}
+        \toprule
+        \textbf{Pico Pin / GPIO} & \textbf{Direction} & \textbf{Peripheral / Signal} & \textbf{Function / Interface Description} \\
+        \midrule
+        \textbf{GPIO4} & Bi-directional & MPU6050 I2C SDA & Sensor data bus ($400\,\text{kHz}$ Fast Mode) \\
+        \textbf{GPIO5} & Output & MPU6050 I2C SCL & Sensor clock line \\
+        \textbf{GPIO10} & Output & SX1262 SPI SCK & LoRaWAN radio SPI clock \\
+        \textbf{GPIO11} & Output & SX1262 SPI MOSI & LoRaWAN radio SPI Master-Out Slave-In \\
+        \textbf{GPIO12} & Input & SX1262 SPI MISO & LoRaWAN radio SPI Master-In Slave-Out \\
+        \textbf{GPIO13} & Output & SX1262 NRESET & Dedicated hardware radio reset line \\
+        \textbf{GPIO14} & Output & Buzzer / Status LED & Piezoelectric acoustic warning ($85\,\text{dB}$) \\
+        \textbf{GPIO15} & Input & Emergency Button & Tactile distress trigger with 100nF RC filter \\
+        \textbf{GPIO16} & Output & SX1262 NSS (CS) & LoRaWAN radio SPI Chip Select (Active Low) \\
+        \textbf{GPIO20} & Input & SX1262 DIO1 & LoRa radio interrupt (Tx/Rx Done) \\
+        \textbf{ADC0 (GPIO26)} & Analog Input & UPS Fuel Gauge & Battery cell analog voltage divider \\
+        \textbf{VSYS / GND} & Power Rail & LiPo Power Input & $3.7\,\text{V}$ nominal from UPS Boost Converter \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{SQLite Database Relational Schema DDL}
+\begin{lstlisting}[language=SQL, caption={Relational SQLite Database Table Definitions}]
+CREATE TABLE staff (
+    staff_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone_number TEXT NOT NULL,
+    department TEXT,
+    special_medical_notes TEXT,
+    is_active INTEGER DEFAULT 1
+);
+
+CREATE TABLE devices (
+    device_id INTEGER PRIMARY KEY,
+    lora_deveui TEXT UNIQUE,
+    ble_mac_address TEXT UNIQUE,
+    assigned_staff_id INTEGER,
+    battery_percentage REAL,
+    last_heartbeat DATETIME,
+    FOREIGN KEY(assigned_staff_id) REFERENCES staff(staff_id)
+);
+
+CREATE TABLE room_zones (
+    zone_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    zone_name TEXT NOT NULL,
+    x_min REAL, y_min REAL,
+    x_max REAL, y_max REAL,
+    floor_level INTEGER DEFAULT 1
+);
+
+CREATE TABLE incident_logs (
+    log_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    device_id INTEGER,
+    event_type TEXT,
+    raw_rssi_data TEXT,
+    estimated_x REAL, estimated_y REAL,
+    resolved_room_name TEXT,
+    dispatch_status TEXT,
+    is_drill INTEGER DEFAULT 0,
+    FOREIGN KEY(device_id) REFERENCES devices(device_id)
+);
+\end{lstlisting}
+

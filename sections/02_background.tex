@@ -1,15 +1,189 @@
-\chapter{Background \& Literature Review}
+\chapter{Theoretical Background \& Literature Review}
 \label{chap:background}
 
-\section{Theoretical Background}
-Provide the mathematical, physical, or computational background relevant to your report. You can write inline equations like $E = mc^2$ or full display equations:
+\section{Theoretical Foundations}
 
+\subsection{Kinematic Principles of Fall Detection}
+Automated fall detection relies on tri-axial inertial measurement unit (IMU) sensing to detect the distinct physical phases of human traumatic falls: initial freefall/weightlessness, high-g kinetic impact upon ground contact, and subsequent post-fall immobility (prostration) \cite{fall_detection_mems}. 
+
+Let the instantaneous linear accelerations along the orthogonal axes of a body-worn sensor be denoted by $a_x(t)$, $a_y(t)$, and $a_z(t)$ in units of gravitational acceleration ($g \approx 9.81\,\text{m/s}^2$). The total Acceleration Vector Magnitude (AVM), denoted as $A_{\text{total}}(t)$, is expressed by:
 \begin{equation}
-\label{eq:sample_equation}
-f(x) = \int_{-\infty}^{\infty} \hat{f}(\xi) \, e^{2 \pi i \xi x} \, d\xi
+\label{eq:avm}
+A_{\text{total}}(t) = \sqrt{a_x(t)^2 + a_y(t)^2 + a_z(t)^2}
 \end{equation}
 
-Equation~\eqref{eq:sample_equation} demonstrates a standard mathematical expression formatted using standard LaTeX notation.
+Similarly, for the tri-axial angular rates $\omega_x(t)$, $\omega_y(t)$, and $\omega_z(t)$ measured by a gyroscope in degrees per second ($^\circ/\text{s}$), the total Angular Velocity Magnitude $\Omega_{\text{total}}(t)$ is defined as:
+\begin{equation}
+\label{eq:gyro_magnitude}
+\Omega_{\text{total}}(t) = \sqrt{\omega_x(t)^2 + \omega_y(t)^2 + \omega_z(t)^2}
+\end{equation}
 
-\section{Literature Survey}
-Discuss previous work, standards, and existing benchmarks. Refer to books \cite{sample_ieee_book} and conference proceedings \cite{sample_ieee_conference}.
+A traumatic fall sequence manifests three deterministic kinematic signatures:
+\begin{enumerate}
+    \item \textbf{Freefall Phase:} Prior to ground collision, the acceleration magnitude experiences a transient valley below gravity:
+    \begin{equation}
+    A_{\text{total}}(t) < \text{Th}_{\text{freefall}} \quad (\text{typically } \approx 0.5g)
+    \end{equation}
+    \item \textbf{Impact Shock Phase:} Collision with the floor results in a rapid mechanical deceleration producing a sharp acceleration spike:
+    \begin{equation}
+    A_{\text{total}}(t) \ge \text{Th}_{\text{impact}} \quad (\text{typically } \ge 2.5g - 3.0g)
+    \end{equation}
+    \item \textbf{Postural Inactivity \& Prostration:} Following impact, if the worker is incapacitated, the device settles into a stationary horizontal orientation. The body tilt angle $\theta_{\text{tilt}}(t)$ relative to the vertical gravity vector is calculated from the low-pass filtered static acceleration components:
+    \begin{equation}
+    \label{eq:tilt_angle}
+    \theta_{\text{tilt}}(t) = \arccos\left(\frac{a_z(t)}{A_{\text{total}}(t)}\right)
+    \end{equation}
+    A prolonged post-impact state where $|\theta_{\text{tilt}}| > \text{Th}_{\text{prostration}}$ and dynamic variance $\sigma_A^2 < \epsilon$ for a duration $\Delta t \ge 1.5\,\text{s}$ confirms a collapse event.
+\end{enumerate}
+
+\subsection{Radio Frequency Propagation \& Path Loss Modeling}
+In wireless indoor localization systems, the Received Signal Strength Indicator (RSSI) measured in decibels relative to one milliwatt ($\text{dBm}$) is a non-linear function of Euclidean distance between the transmitter and receiver \cite{ble_indoor_survey}. In enclosed industrial spaces, signal attenuation is governed by the Log-Distance Path Loss Model:
+\begin{equation}
+\label{eq:log_distance_path_loss}
+\text{RSSI}(d) = \text{RSSI}(d_0) - 10 \, n \, \log_{10}\left(\frac{d}{d_0}\right) + X_\sigma
+\end{equation}
+where:
+\begin{itemize}
+    \item $d$ is the Euclidean distance between transmitter and receiver (meters),
+    \item $d_0$ is the reference distance (standardized at $d_0 = 1\,\text{m}$),
+    \item $\text{RSSI}(d_0)$ (or $A$) is the measured signal strength at $1\,\text{m}$ (typically $-50\,\text{dBm}$ to $-65\,\text{dBm}$),
+    \item $n$ is the Path Loss Exponent (PLE), representing environmental attenuation ($n=2.0$ for free-space, $n=2.5-3.5$ for office spaces, and $n=3.5-5.0$ in cluttered industrial environments with metallic obstacles),
+    \item $X_\sigma \sim \mathcal{N}(0, \sigma^2)$ is a zero-mean Gaussian random variable capturing shadow fading and multipath reflections.
+\end{itemize}
+
+Inverting Equation~\eqref{eq:log_distance_path_loss} yields the estimated distance $\hat{d}$ from a measured RSSI value:
+\begin{equation}
+\label{eq:rssi_to_distance}
+\hat{d} = d_0 \cdot 10^{\frac{\text{RSSI}(d_0) - \text{RSSI}}{10\,n}}
+\end{equation}
+
+\subsection{Geometric Localization: Trilateration \& Weighted Centroid}
+Given a network of $M \ge 3$ fixed BLE gateways located at known 2D Cartesian coordinates $(x_i, y_i)$ with corresponding estimated distances $\hat{d}_i$, the target node position $(x, y)$ satisfies the non-linear system of intersecting circles \cite{trilateration_indoor}:
+\begin{equation}
+\label{eq:trilateration_circle}
+(x - x_i)^2 + (y - y_i)^2 = \hat{d}_i^2, \quad \forall i \in \{1, 2, \dots, M\}
+\end{equation}
+
+Linearizing Equation~\eqref{eq:trilateration_circle} by subtracting the $M$-th circle equation from the preceding $M-1$ equations yields the linear matrix equation $\mathbf{A} \mathbf{x} = \mathbf{b}$:
+\begin{equation}
+\label{eq:trilateration_matrix}
+2 \begin{bmatrix}
+x_1 - x_M & y_1 - y_M \\
+x_2 - x_M & y_2 - y_M \\
+\vdots & \vdots \\
+x_{M-1} - x_M & y_{M-1} - y_M
+\end{bmatrix}
+\begin{bmatrix}
+x \\ y
+\end{bmatrix}
+=
+\begin{bmatrix}
+(x_1^2 - x_M^2) + (y_1^2 - y_M^2) + (\hat{d}_M^2 - \hat{d}_1^2) \\
+(x_2^2 - x_M^2) + (y_2^2 - y_M^2) + (\hat{d}_M^2 - \hat{d}_2^2) \\
+\vdots \\
+(x_{M-1}^2 - x_M^2) + (y_{M-1}^2 - y_M^2) + (\hat{d}_M^2 - \hat{d}_{M-1}^2)
+\end{bmatrix}
+\end{equation}
+
+The optimal least-squares position estimate $\hat{\mathbf{x}} = [\hat{x}, \hat{y}]^T$ is solved via Moore-Penrose pseudo-inversion:
+\begin{equation}
+\label{eq:least_squares_solution}
+\hat{\mathbf{x}} = (\mathbf{A}^T \mathbf{A})^{-1} \mathbf{A}^T \mathbf{b}
+\end{equation}
+
+In scenarios where geometric trilateration becomes ill-conditioned due to co-linear gateway placement or extreme multipath fading, Weighted Centroid Localization (WCL) provides a robust fallback:
+\begin{equation}
+\label{eq:weighted_centroid}
+\hat{x} = \frac{\sum_{i=1}^M w_i x_i}{\sum_{i=1}^M w_i}, \quad \hat{y} = \frac{\sum_{i=1}^M w_i y_i}{\sum_{i=1}^M w_i}, \quad \text{where } w_i = \frac{1}{\hat{d}_i^p} \text{ or } w_i = 10^{\frac{\text{RSSI}_i}{10}}
+\end{equation}
+
+\subsection{State Estimation via Discrete Kalman Filtering}
+To suppress high-frequency fluctuations and multipath noise in dynamic RSSI measurements, a discrete one-dimensional Kalman Filter is applied to raw signal streams prior to distance transformation \cite{kalman_ble_filter}. The state space is formulated as:
+\begin{align}
+x_k &= x_{k-1} + w_k, \quad w_k \sim \mathcal{N}(0, Q) \label{eq:kf_process} \\
+z_k &= x_k + v_k, \quad v_k \sim \mathcal{N}(0, R) \label{eq:kf_measure}
+\end{align}
+where $x_k$ represents the true underlying RSSI state at time step $k$, $z_k$ is the raw measured RSSI, $Q$ is the process noise covariance, and $R$ is the measurement noise covariance.
+
+The recursive two-step Kalman estimation algorithm executes as follows:
+\begin{enumerate}
+    \item \textbf{Time Update (Predict):}
+    \begin{align}
+    \hat{x}_k^- &= \hat{x}_{k-1} \label{eq:kf_pred_state} \\
+    P_k^- &= P_{k-1} + Q \label{eq:kf_pred_cov}
+    \end{align}
+    \item \textbf{Measurement Update (Correct):}
+    \begin{align}
+    K_k &= \frac{P_k^-}{P_k^- + R} \label{eq:kf_gain} \\
+    \hat{x}_k &= \hat{x}_k^- + K_k \left(z_k - \hat{x}_k^-\right) \label{eq:kf_update_state} \\
+    P_k &= (1 - K_k) P_k^- \label{eq:kf_update_cov}
+    \end{align}
+\end{enumerate}
+Here, $K_k \in [0, 1]$ is the dynamic Kalman gain, which balances responsiveness against high-frequency noise rejection.
+
+\subsection{Fuzzy Logic Inference for Room-Level Classification}
+Due to the non-linearities and spatial anomalies inherent to indoor RF environments, converting filtered RSSI values into absolute coordinate pairs $(x, y)$ can produce spatial errors exceeding room dimensions. To address this, a Mamdani Fuzzy Inference System (FIS) is integrated to map signal vector profiles directly into discrete room probabilities \cite{fuzzy_rssi_localization}.
+
+The fuzzy inference engine processes three primary linguistic inputs for each gateway:
+\begin{itemize}
+    \item \textbf{Signal Strength ($\mu_{\text{RSSI}}$):} Partitioned into fuzzy sets $\{\text{Weak}, \text{Medium}, \text{Strong}, \text{Near-Field}\}$.
+    \item \textbf{Signal Variance ($\sigma_{\text{RSSI}}$):} Evaluates environmental stability as $\{\text{Stable}, \text{Fluctuating}\}$.
+    \item \textbf{Inter-Gateway RSSI Delta ($\Delta \text{RSSI}_{ij} = \text{RSSI}_i - \text{RSSI}_j$):} Evaluates relative spatial proximity.
+\end{itemize}
+
+A typical rule base executes as:
+\begin{equation*}
+\mathcal{R}_k: \textbf{IF } \text{RSSI}_1 \text{ is Strong AND } \text{RSSI}_2 \text{ is Weak AND } \Delta \text{RSSI}_{12} > 15\,\text{dB} \textbf{ THEN } \text{Zone is Office 1}
+\end{equation*}
+Defuzzification using the Center of Gravity (CoG) method yields a crisp confidence index for each mapped Room Zone, ensuring robust spatial classification even when line-of-sight is obstructed by structural walls.
+
+\subsection{Wireless Protocol Architecture: LoRaWAN vs. Wi-Fi}
+The dual-redundant communication backbone of the ERS balances the distinct operational advantages of Chirp Spread Spectrum (CSS) LoRaWAN and Orthogonal Frequency-Division Multiplexing (OFDM) Wi-Fi (IEEE 802.11 b/g/n) \cite{wifi_lora_synergy}:
+
+\begin{itemize}
+    \item \textbf{LoRaWAN (Sub-GHz, AU915 Band):} Operates with a wide link budget ($>150\,\text{dB}$) and robust obstacle penetration through metallic machinery and structural steel. It utilizes an uncoordinated ALOHA channel access model with spreading factors $SF \in \{7, 8, \dots, 12\}$. For an $N$-byte payload, the total packet airtime $T_{\text{packet}}$ is:
+    \begin{equation}
+    \label{eq:lora_airtime}
+    T_{\text{packet}} = T_{\text{preamble}} + T_{\text{payload}} = \left(N_{\text{preamble}} + 4.25\right) T_{\text{sym}} + N_{\text{payload\_sym}} T_{\text{sym}}
+    \end{equation}
+    where the symbol duration $T_{\text{sym}} = \frac{2^{SF}}{\text{BW}}$. To minimize collision probability and maximize battery life, payloads must be compressed into minimal binary representations.
+    \item \textbf{Wi-Fi (2.4 GHz IEEE 802.11):} Provides high-throughput ($>10\,\text{Mbps}$), low-latency ($<50\,\text{ms}$) IP-level connectivity with standard Carrier Sense Multiple Access with Collision Avoidance (CSMA/CA). However, 2.4~GHz carrier frequencies suffer from severe attenuation through heavy industrial cladding and require higher sustained transceiver current ($80-120\,\text{mA}$ active vs. $<25\,\text{mA}$ for LoRa).
+\end{itemize}
+
+\section{Industrial Standards \& Competitive Landscape}
+
+\subsection{Occupational Health \& Safety Compliance Framework}
+Under the Safe Work Australia Model Code of Practice \cite{safework2020}, employers are legally mandated to implement systems of work that:
+\begin{enumerate}
+    \item Provide effective communication systems with workers who work alone or in remote areas.
+    \item Establish scheduled check-in and automated fail-safe distress escalation protocols.
+    \item Maintain rapid emergency dispatch capabilities with precise location tracking to ensure medical assistance within critical response windows.
+\end{enumerate}
+
+Furthermore, compliance with ISO 45001:2018 Clause 8.2 (Emergency Preparedness and Response) necessitates verified periodic testing, incident tracking, and documented audit trails \cite{iso45001}.
+
+\subsection{Competitive Solution Benchmarking}
+Table~\ref{tab:competitive_benchmark} benchmarks the Micromax Emergency Response System against leading commercial enterprise lone-worker solutions \cite{lone_worker_safety_review}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Commercial Lone-Worker Safety System Comparison}
+    \label{tab:competitive_benchmark}
+    \begin{tabularx}{\textwidth}{l X X X X}
+        \toprule
+        \textbf{Feature / Parameter} & \textbf{Micromax ERS} & \textbf{Blackline Safety G7c} & \textbf{SoloProtect ID Touch} & \textbf{Wearin' Connected} \\
+        \midrule
+        \textbf{Commercial Model} & One-off CAPEX purchase & SaaS subscription (\$30--60/mo/unit) & SaaS subscription (\$25--50/mo/unit) & Enterprise bundle + SaaS \\
+        \textbf{Primary Wireless} & LoRaWAN (AU915, 8-Ch) & Cellular (4G LTE-M / 2G) & Cellular (4G / VoLTE) & Cellular + Mesh BLE \\
+        \textbf{Backup Wireless} & IEEE 802.11 b/g/n Wi-Fi & Satellite (add-on module) & None & Local BLE gateway \\
+        \textbf{Indoor Positioning} & BLE Gateways + Room Zones & Location Beacons (Cellular) & BLE / Wi-Fi Sniffing & Proprietary AoA Beacons \\
+        \textbf{Fall Detection} & 6-DOF IMU + 10s grace & 3-Axis Accelerometer & Accelerometer (Man-Down) & IMU + Biometrics \\
+        \textbf{Facility Siren/Relay} & Direct dry-contact relay & API webhook / external & Cloud API only & Cloud API only \\
+        \textbf{Data Ownership} & On-premises SQLite / Edge & Cloud hosted (Vendor) & Cloud hosted (Vendor) & Cloud / Hybrid \\
+        \textbf{Drill / Audit Mode} & Integrated web drill mode & Manual log flagging & Portal export & Specialized software \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+As demonstrated in Table~\ref{tab:competitive_benchmark}, the Micromax ERS eliminates recurring subscription overheads while providing localized hardware redundancy, on-premises compliance auditing, and native facility hardware actuation.
+

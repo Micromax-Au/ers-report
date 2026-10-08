@@ -1,8 +1,26 @@
 \chapter{Conclusion \& Future Work}
 \label{chap:conclusion}
 
-\section{Summary of Work}
-Summarize the main achievements of the report and how objectives set out in Chapter~\ref{chap:introduction} were met.
+\section{Summary of Engineering Achievements}
+This technical report has presented the comprehensive systems engineering design, empirical characterization, and commercialisation roadmap of the Micromax Emergency Response System (ERS) for industrial organisations. Evolving from an exploratory university capstone proof-of-concept (ECTE351) to an integrated, field-tested functional industrial prototype (ECTE399 R\&D), the project successfully addresses critical Work Health and Safety (WHS) compliance mandates for lone and isolated workers.
 
-\section{Future Work}
-Outline potential extensions, optimizations, and future research directions.
+The major technical milestones and engineering deliverables achieved in this work include:
+\begin{enumerate}
+    \item \textbf{Deterministic Multi-Modal Emergency Detection:} Implemented robust embedded logic on the wearable client distinguishing between deliberate Personal Emergencies ($>2.0\,\text{s}$ press-and-hold) and facility-wide Mass Emergencies ($5$ rapid presses within $3.0\,\text{s}$), alongside resolving critical GPIO15 hardware reset conflicts.
+    \item \textbf{Kinematic Fall Detection with Grace Cancellation:} Calibrated a 6-DOF IMU algorithm capable of reliably capturing freefall ($<0.5g$) and high-impact ($>2.8g$) dynamics while rejecting routine Activities of Daily Living (e.g., prostration in prayer, sitting, stair descent), reinforced by a 10-second audible cancellation window that achieved a $100\%$ false-alarm suppression rate in testing.
+    \item \textbf{Dual-Redundant Wireless Telemetry Architecture:} Developed a fail-safe communication pipeline combining primary sub-GHz LoRaWAN (AU915, SF7) utilizing an ultra-compact 4-byte binary payload ($36.1\,\text{ms}$ airtime, $98.4\%$ delivery rate) with an autonomous $3.96\,\text{second}$ failover to IEEE 802.11 Wi-Fi upon transmission timeout.
+    \item \textbf{Symbolic Indoor Positioning via Room Zone Mapping:} Deployed a multi-gateway BLE tracking infrastructure and established that Mamdani Fuzzy Inference mapping to polygon-based Room Zones outperforms continuous coordinate trilateration in metallic multipath environments, achieving a $94.8\%$ room classification accuracy.
+    \item \textbf{Centralized Edge Processing & Automated Multi-Channel Dispatch:} Built an on-premises Raspberry Pi 5 server hosting multithreaded ingress daemons, an SQLite relational database, dynamic web-based floor plan configuration, and parallel dispatch workers (cellular SMS via Twilio, SMTP email, acoustic sirens, and optocoupled dry-contact industrial relays).
+    \item \textbf{Power & UPS Resilience:} Validated a $24.5\,\text{hour}$ wearable battery lifespan ($1100\,\text{mAh}$ LiPo, $\text{SF} = 2.04$ for $12\,\text{h}$ shifts) and demonstrated $9\,\text{hours } 52\,\text{minutes}$ of autonomous server survivability during total mains power blackout with automated SMS warnings and safe shutdown at $3.2\,\text{V}$.
+\end{enumerate}
+
+\section{Future Research \& Engineering Directions}
+To build upon the foundation established in this report and support full-scale commercial deployment, several strategic engineering directions are identified:
+
+\begin{itemize}
+    \item \textbf{Bluetooth 5.1 Angle of Arrival (AoA) Integration:} Partnering with commercial RTLS providers (such as BlueIOT) to evaluate multi-antenna AoA array locator gateways. By measuring RF phase differences, AoA promises sub-meter ($<0.5\,\text{m}$) 3D positioning accuracy, enabling precise tracking within dense machinery bays and multi-tier industrial racking.
+    \item \textbf{Edge-AI / TinyML Kinematic Classification:} Deploying lightweight neural network models (e.g., 1D Convolutional Neural Networks or TinyML Random Forests) directly onto the ARM Cortex-M4F core using TensorFlow Lite for Microcontrollers. This will enable complex temporal motion gesture classification, eliminating fixed threshold sensitivity across diverse human body masses and operational postures.
+    \item \textbf{Ultra-Low-Power Dormant State Optimization:} Implementing deep-sleep power gating with accelerometer interrupt waking ($\mu\text{A}$-level quiescent draw) to extend client battery endurance from days to several months per charge cycle.
+    \item \textbf{Autonomous Drone-Assisted Emergency Verification:} Developing software hooks within the central server to autonomously task docked industrial UAVs to outdoor emergency coordinates, providing instant live video reconnaissance to incident controllers during critical search-and-rescue operations.
+\end{itemize}
+

@@ -1,13 +1,20 @@
 \chapter*{Executive Summary}
 \addcontentsline{toc}{chapter}{Executive Summary}
 
-This executive summary provides a high-level overview of the engineering project, key objectives, methodology, main findings, and core recommendations.
+This technical engineering report presents the design, prototype evolution, empirical performance analysis, and commercialisation strategy of the \textbf{Emergency Response System (ERS) for Organisations}. Developed by the Research and Development Engineering Division at Micromax Technology Pty Ltd, this platform addresses statutory Work Health and Safety (WHS) compliance mandates and duty-of-care obligations for lone, isolated, and high-risk workers across industrial, manufacturing, logistics, and healthcare environments.
 
-\section*{Key Objectives}
+Evolving from an initial academic proof-of-concept (ECTE351) to a fully functional, field-tested industrial prototype (ECTE399 R\&D), the system bridges the gap between theoretical embedded design and robust on-premises deployment. By eliminating the recurring Software-as-a-Service (SaaS) subscription fees characteristic of commercial competitors, the ERS provides an economically viable, one-off capital expenditure (CAPEX) solution offering complete on-premises data ownership and direct facility hardware integration.
+
+\section*{Key Technological Breakthroughs \& Deliverables}
 \begin{itemize}
-    \item Define primary objective 1.
-    \item Define primary objective 2.
+    \item \textbf{Deterministic Multi-Modal Emergency Detection:} Engineered wearable client firmware capable of distinguishing deliberate Personal Emergencies ($>2.0\,\text{s}$ press-and-hold) from facility-wide Mass Emergencies ($5$ rapid clicks in $<3.0\,\text{s}$), alongside solving underlying microcontroller GPIO pin-sharing reset conflicts.
+    \item \textbf{Kinematic Fall Detection with Grace Window:} Implemented a 6-DOF inertial measurement algorithm capturing freefall ($<0.5g$) and traumatic impact ($>2.8g$) while rejecting routine daily motions (e.g., prayer prostration, stair descent), coupled with a 10-second acoustic/visual cancellation grace window that achieved a $100\%$ false-alarm suppression rate.
+    \item \textbf{Dual-Redundant Wireless Telemetry:} Developed a dual-link communication architecture prioritizing sub-GHz LoRaWAN (AU915, SF7) utilizing an ultra-compact 4-byte binary payload ($36.1\,\text{ms}$ airtime, $98.4\%$ packet delivery rate through structural steel) with an autonomous $3.96\,\text{second}$ failover to IEEE 802.11 Wi-Fi.
+    \item \textbf{Symbolic Indoor Positioning via Room Zone Mapping:} Deployed a Bluetooth Low Energy (BLE) gateway infrastructure and established that Mamdani Fuzzy Inference mapping directly to polygon-based Room Zones achieves a $94.8\%$ classification accuracy, resolving severe RF multipath anomalies inherent to steel-clad industrial buildings.
+    \item \textbf{Centralized Edge Telemetry \& Multi-Channel Dispatch:} Deployed an on-premises Raspberry Pi 5 server hosting multithreaded ingress listeners, an SQLite audit database, a web-based floor plan zoning interface, and automated dispatch engines (cellular SMS via Twilio API, SMTP email, acoustic sirens, and physical optocoupled dry-contact industrial relays).
+    \item \textbf{Power \& Backup System Resilience:} Validated a $24.5\,\text{hour}$ continuous wearable battery lifespan ($1100\,\text{mAh}$ LiPo, Factor of Safety $= 2.04$ for $12\,\text{h}$ shifts) and demonstrated $9\,\text{hours } 52\,\text{minutes}$ of autonomous server survivability during total building power blackout.
 \end{itemize}
 
-\section*{Summary of Results \& Impact}
-Provide a brief summary of quantitative results, performance benchmarks, or design outcomes achieved.
+\section*{Commercial Readiness \& Strategic Roadmap}
+The prototype hardware baseline has been validated at a total unit procurement cost of $\$966.10\,\text{AUD}$. Transitioning to the commercialisation phase (structured over a 60-day industrial engagement), the platform will consolidate all wearable circuitry onto a custom monolithic 4-layer SMT printed circuit board (reducing per-unit wearable BOM to $<\$32.00\,\text{AUD}$ at scale), enclosed within an IP67-rated drop-resistant polycarbonate housing. The roadmap includes 30-day live customer pilot deployments (e.g., Goldstream RV manufacturing plant) and strategic scoping for autonomous drone-assisted outdoor emergency verification.
+

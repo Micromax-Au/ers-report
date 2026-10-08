@@ -1,0 +1,429 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 3.3 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global/global}
+    \entry{safework2020}{standard}{}{}
+      \list{organization}{1}{%
+        {Safe Work Australia}%
+      }
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{note}{Section 4: Remote or Isolated Work}
+      \field{title}{Managing the Work Environment and Facilities Code of Practice}
+      \field{year}{2020}
+      \verb{urlraw}
+      \verb https://www.safeworkaustralia.gov.au/doc/model-code-practice-managing-work-environment-and-facilities
+      \endverb
+      \verb{url}
+      \verb https://www.safeworkaustralia.gov.au/doc/model-code-practice-managing-work-environment-and-facilities
+      \endverb
+    \endentry
+    \entry{iso45001}{standard}{}{}
+      \list{location}{1}{%
+        {Geneva, Switzerland}%
+      }
+      \list{organization}{1}{%
+        {International Organization for Standardization}%
+      }
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labeltitlesource}{title}
+      \field{number}{ISO 45001:2018}
+      \field{title}{Occupational health and safety management systems -- Requirements with guidance for use}
+      \field{year}{2018}
+    \endentry
+    \entry{lone_worker_safety_review}{article}{}{}
+      \name{author}{4}{}{%
+        {{hash=8d470804857c5ea280612671eaac2057}{%
+           family={Memon},
+           familyi={M\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+        {{hash=53903ef23ab8fd1c9084cf4f22911ec7}{%
+           family={Kundi},
+           familyi={K\bibinitperiod},
+           given={F.\bibnamedelimi M.},
+           giveni={F\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=24b0590b864e07ebddca60cd2459c258}{%
+           family={Keerio},
+           familyi={K\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=0163d7524f239e3df6cac57aad93f21d}{%
+           family={Memon},
+           familyi={M\bibinitperiod},
+           given={R.},
+           giveni={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{b1716e001d45adfea6c11b160d963c35}
+      \strng{fullhash}{7e12f18357746cc7f0fda2aa18f83a8f}
+      \strng{fullhashraw}{7e12f18357746cc7f0fda2aa18f83a8f}
+      \strng{bibnamehash}{7e12f18357746cc7f0fda2aa18f83a8f}
+      \strng{authorbibnamehash}{7e12f18357746cc7f0fda2aa18f83a8f}
+      \strng{authornamehash}{b1716e001d45adfea6c11b160d963c35}
+      \strng{authorfullhash}{7e12f18357746cc7f0fda2aa18f83a8f}
+      \strng{authorfullhashraw}{7e12f18357746cc7f0fda2aa18f83a8f}
+      \field{sortinit}{3}
+      \field{sortinithash}{ad6fe7482ffbd7b9f99c9e8b5dccd3d7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{International Journal of Advanced Computer Science and Applications}
+      \field{number}{8}
+      \field{title}{Design and Implementation of Smart Safety Devices for Industrial Lone Workers}
+      \field{volume}{13}
+      \field{year}{2022}
+      \field{pages}{450\bibrangedash 458}
+      \range{pages}{9}
+      \verb{doi}
+      \verb 10.14569/IJACSA.2022.0130852
+      \endverb
+    \endentry
+    \entry{fall_detection_mems}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=99fe0390e2e76d3dba0bb89f7a4040b7}{%
+           family={Bourke},
+           familyi={B\bibinitperiod},
+           given={Alan\bibnamedelima K.},
+           giveni={A\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=bb6c48ff610697bce2f7be7a8caf5060}{%
+           family={O'Brien},
+           familyi={O\bibinitperiod},
+           given={John\bibnamedelima V.},
+           giveni={J\bibinitperiod\bibinitdelim V\bibinitperiod}}}%
+        {{hash=df74bcb65c0a6c3f4738d80d00cc1f67}{%
+           family={Lyons},
+           familyi={L\bibinitperiod},
+           given={Gerard\bibnamedelima M.},
+           giveni={G\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+      }
+      \strng{namehash}{036126d85fd129e6a71edccbd36f1a06}
+      \strng{fullhash}{c6804ca6b0cb74d18fb71b93ca15c072}
+      \strng{fullhashraw}{c6804ca6b0cb74d18fb71b93ca15c072}
+      \strng{bibnamehash}{c6804ca6b0cb74d18fb71b93ca15c072}
+      \strng{authorbibnamehash}{c6804ca6b0cb74d18fb71b93ca15c072}
+      \strng{authornamehash}{036126d85fd129e6a71edccbd36f1a06}
+      \strng{authorfullhash}{c6804ca6b0cb74d18fb71b93ca15c072}
+      \strng{authorfullhashraw}{c6804ca6b0cb74d18fb71b93ca15c072}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Gait \& Posture}
+      \field{number}{2}
+      \field{title}{Evaluation of a Threshold-Based Tri-Axial Accelerometer Fall Detection Algorithm}
+      \field{volume}{26}
+      \field{year}{2007}
+      \field{pages}{194\bibrangedash 199}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1016/gaitpost.2006.09.012
+      \endverb
+    \endentry
+    \entry{ble_indoor_survey}{article}{}{}
+      \name{author}{3}{}{%
+        {{hash=195ca55bbed6416d65e59307e5283295}{%
+           family={Zafari},
+           familyi={Z\bibinitperiod},
+           given={Faheem},
+           giveni={F\bibinitperiod}}}%
+        {{hash=b41f5b89eddcb048fce2d97d566294ce}{%
+           family={Gkelias},
+           familyi={G\bibinitperiod},
+           given={Athanasios},
+           giveni={A\bibinitperiod}}}%
+        {{hash=5aa48ddf606faa8081c96eaf1efcfebb}{%
+           family={Leung},
+           familyi={L\bibinitperiod},
+           given={Kin\bibnamedelima K.},
+           giveni={K\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \strng{namehash}{1fee23b124d7e3569bb190bba971684d}
+      \strng{fullhash}{e9b36037f0adc41d54b0b2ff32a1a99a}
+      \strng{fullhashraw}{e9b36037f0adc41d54b0b2ff32a1a99a}
+      \strng{bibnamehash}{e9b36037f0adc41d54b0b2ff32a1a99a}
+      \strng{authorbibnamehash}{e9b36037f0adc41d54b0b2ff32a1a99a}
+      \strng{authornamehash}{1fee23b124d7e3569bb190bba971684d}
+      \strng{authorfullhash}{e9b36037f0adc41d54b0b2ff32a1a99a}
+      \strng{authorfullhashraw}{e9b36037f0adc41d54b0b2ff32a1a99a}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Communications Surveys \& Tutorials}
+      \field{number}{3}
+      \field{title}{A Survey of Indoor Localization Systems and Technologies}
+      \field{volume}{21}
+      \field{year}{2019}
+      \field{pages}{2568\bibrangedash 2599}
+      \range{pages}{32}
+      \verb{doi}
+      \verb 10.1109/COMST.2019.2911558
+      \endverb
+    \endentry
+    \entry{trilateration_indoor}{inproceedings}{}{}
+      \name{author}{2}{}{%
+        {{hash=981441e0ec4027aa7d70f856eb9e3a69}{%
+           family={Subedi},
+           familyi={S\bibinitperiod},
+           given={Santosh},
+           giveni={S\bibinitperiod}}}%
+        {{hash=db874b4e20bb32ee02f01fa2c4bccc4b}{%
+           family={Pyun},
+           familyi={P\bibinitperiod},
+           given={Jae-Young},
+           giveni={J\bibinithyphendelim Y\bibinitperiod}}}%
+      }
+      \strng{namehash}{4ef53e6d46a1ad68a0270817e4523a8d}
+      \strng{fullhash}{4ef53e6d46a1ad68a0270817e4523a8d}
+      \strng{fullhashraw}{4ef53e6d46a1ad68a0270817e4523a8d}
+      \strng{bibnamehash}{4ef53e6d46a1ad68a0270817e4523a8d}
+      \strng{authorbibnamehash}{4ef53e6d46a1ad68a0270817e4523a8d}
+      \strng{authornamehash}{4ef53e6d46a1ad68a0270817e4523a8d}
+      \strng{authorfullhash}{4ef53e6d46a1ad68a0270817e4523a8d}
+      \strng{authorfullhashraw}{4ef53e6d46a1ad68a0270817e4523a8d}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the International Conference on Information Networking (ICOIN)}
+      \field{title}{Practical {RSSI}-based Indoor Localization Using Fingerprinting and Trilateration}
+      \field{year}{2017}
+      \field{pages}{723\bibrangedash 725}
+      \range{pages}{3}
+      \verb{doi}
+      \verb 10.1109/ICOIN.2017.7899522
+      \endverb
+    \endentry
+    \entry{kalman_ble_filter}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=f6bac1a9265d1891392830ba89b111b1}{%
+           family={Chawathe},
+           familyi={C\bibinitperiod},
+           given={Sudarshan\bibnamedelima S.},
+           giveni={S\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+      }
+      \strng{namehash}{f6bac1a9265d1891392830ba89b111b1}
+      \strng{fullhash}{f6bac1a9265d1891392830ba89b111b1}
+      \strng{fullhashraw}{f6bac1a9265d1891392830ba89b111b1}
+      \strng{bibnamehash}{f6bac1a9265d1891392830ba89b111b1}
+      \strng{authorbibnamehash}{f6bac1a9265d1891392830ba89b111b1}
+      \strng{authornamehash}{f6bac1a9265d1891392830ba89b111b1}
+      \strng{authorfullhash}{f6bac1a9265d1891392830ba89b111b1}
+      \strng{authorfullhashraw}{f6bac1a9265d1891392830ba89b111b1}
+      \field{sortinit}{7}
+      \field{sortinithash}{108d0be1b1bee9773a1173443802c0a3}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Mobile Computing}
+      \field{number}{4}
+      \field{title}{Low-Latency Indoor Localization Using {Bluetooth Low Energy} Beacons and {Kalman} Filters}
+      \field{volume}{20}
+      \field{year}{2021}
+      \field{pages}{1412\bibrangedash 1424}
+      \range{pages}{13}
+      \verb{doi}
+      \verb 10.1109/TMC.2019.2959821
+      \endverb
+    \endentry
+    \entry{fuzzy_rssi_localization}{article}{}{}
+      \name{author}{5}{}{%
+        {{hash=7cb0d2e145d42903344145ad9b4fdd1b}{%
+           family={Yassin},
+           familyi={Y\bibinitperiod},
+           given={A.},
+           giveni={A\bibinitperiod}}}%
+        {{hash=48f4e1569121e9635a1660a0acda7137}{%
+           family={Nasser},
+           familyi={N\bibinitperiod},
+           given={Y.},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=fb818389c0e95f0d15cb1f9f6094c54c}{%
+           family={Awad},
+           familyi={A\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+        {{hash=b5addc94776e18073a640f6bffa1c7d3}{%
+           family={Jansen},
+           familyi={J\bibinitperiod},
+           given={M.},
+           giveni={M\bibinitperiod}}}%
+        {{hash=e7970663005059b4e217ebb3ca7860f0}{%
+           family={Boudjit},
+           familyi={B\bibinitperiod},
+           given={S.},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{338a43a92a55ada8b34359604eb382ec}
+      \strng{fullhash}{0943f20fe4dd6bf7c60f1dba7679afd4}
+      \strng{fullhashraw}{0943f20fe4dd6bf7c60f1dba7679afd4}
+      \strng{bibnamehash}{0943f20fe4dd6bf7c60f1dba7679afd4}
+      \strng{authorbibnamehash}{0943f20fe4dd6bf7c60f1dba7679afd4}
+      \strng{authornamehash}{338a43a92a55ada8b34359604eb382ec}
+      \strng{authorfullhash}{0943f20fe4dd6bf7c60f1dba7679afd4}
+      \strng{authorfullhashraw}{0943f20fe4dd6bf7c60f1dba7679afd4}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Communications Surveys \& Tutorials}
+      \field{number}{2}
+      \field{title}{Recent Advances in Indoor Localization: A Survey on {RF} and Non-{RF} Technologies}
+      \field{volume}{19}
+      \field{year}{2017}
+      \field{pages}{1327\bibrangedash 1376}
+      \range{pages}{50}
+      \verb{doi}
+      \verb 10.1109/COMST.2016.2632427
+      \endverb
+    \endentry
+    \entry{wifi_lora_synergy}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=3252284bf8536ce6970e93aec9602442}{%
+           family={{LoRa Alliance and Wireless Broadband Alliance}},
+           familyi={L\bibinitperiod}}}%
+      }
+      \strng{namehash}{3252284bf8536ce6970e93aec9602442}
+      \strng{fullhash}{3252284bf8536ce6970e93aec9602442}
+      \strng{fullhashraw}{3252284bf8536ce6970e93aec9602442}
+      \strng{bibnamehash}{3252284bf8536ce6970e93aec9602442}
+      \strng{authorbibnamehash}{3252284bf8536ce6970e93aec9602442}
+      \strng{authornamehash}{3252284bf8536ce6970e93aec9602442}
+      \strng{authorfullhash}{3252284bf8536ce6970e93aec9602442}
+      \strng{authorfullhashraw}{3252284bf8536ce6970e93aec9602442}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{White Paper}
+      \field{title}{Wi-Fi \& {LoRaWAN} Deployment Synergies: Expanding Business Opportunities with Combined Technologies}
+      \field{year}{2020}
+      \verb{urlraw}
+      \verb https://lora-alliance.org/resource_hub/wi-fi-lorawan-deployment-synergies/
+      \endverb
+      \verb{url}
+      \verb https://lora-alliance.org/resource_hub/wi-fi-lorawan-deployment-synergies/
+      \endverb
+    \endentry
+    \entry{rp2040_datasheet}{manual}{}{}
+      \name{author}{1}{}{%
+        {{hash=abdff8c3bc7ac1a29e4f7edc008fe26b}{%
+           family={{Raspberry Pi Ltd}},
+           familyi={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{fullhash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{fullhashraw}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{bibnamehash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{authorbibnamehash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{authornamehash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{authorfullhash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{authorfullhashraw}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \field{extraname}{1}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{RP2040} Microcontroller Datasheet: A high performance microcontroller with flexible digital interfaces}
+      \field{year}{2023}
+      \verb{urlraw}
+      \verb https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf
+      \endverb
+      \verb{url}
+      \verb https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf
+      \endverb
+    \endentry
+    \entry{inven_mpu6050}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=35953177f983c5c55ad76715ebf43b1f}{%
+           family={{InvenSense Inc.}},
+           familyi={I\bibinitperiod}}}%
+      }
+      \strng{namehash}{35953177f983c5c55ad76715ebf43b1f}
+      \strng{fullhash}{35953177f983c5c55ad76715ebf43b1f}
+      \strng{fullhashraw}{35953177f983c5c55ad76715ebf43b1f}
+      \strng{bibnamehash}{35953177f983c5c55ad76715ebf43b1f}
+      \strng{authorbibnamehash}{35953177f983c5c55ad76715ebf43b1f}
+      \strng{authornamehash}{35953177f983c5c55ad76715ebf43b1f}
+      \strng{authorfullhash}{35953177f983c5c55ad76715ebf43b1f}
+      \strng{authorfullhashraw}{35953177f983c5c55ad76715ebf43b1f}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Document Number: PS-MPU-6000A-00}
+      \field{title}{{MPU-6000} and {MPU-6050} Product Specification Revision 3.4}
+      \field{year}{2013}
+    \endentry
+    \entry{rpi5_datasheet}{manual}{}{}
+      \name{author}{1}{}{%
+        {{hash=abdff8c3bc7ac1a29e4f7edc008fe26b}{%
+           family={{Raspberry Pi Ltd}},
+           familyi={R\bibinitperiod}}}%
+      }
+      \strng{namehash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{fullhash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{fullhashraw}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{bibnamehash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{authorbibnamehash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{authornamehash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{authorfullhash}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \strng{authorfullhashraw}{abdff8c3bc7ac1a29e4f7edc008fe26b}
+      \field{extraname}{2}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{{Raspberry Pi 5} Product Brief}
+      \field{year}{2023}
+      \verb{urlraw}
+      \verb https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf
+      \endverb
+      \verb{url}
+      \verb https://datasheets.raspberrypi.com/rpi5/raspberry-pi-5-product-brief.pdf
+      \endverb
+    \endentry
+    \entry{semtech_sx1302}{article}{}{}
+      \name{author}{1}{}{%
+        {{hash=1696cc5da74cfa805cfbe6dcbfea03f8}{%
+           family={{Semtech Corporation}},
+           familyi={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{1696cc5da74cfa805cfbe6dcbfea03f8}
+      \strng{fullhash}{1696cc5da74cfa805cfbe6dcbfea03f8}
+      \strng{fullhashraw}{1696cc5da74cfa805cfbe6dcbfea03f8}
+      \strng{bibnamehash}{1696cc5da74cfa805cfbe6dcbfea03f8}
+      \strng{authorbibnamehash}{1696cc5da74cfa805cfbe6dcbfea03f8}
+      \strng{authornamehash}{1696cc5da74cfa805cfbe6dcbfea03f8}
+      \strng{authorfullhash}{1696cc5da74cfa805cfbe6dcbfea03f8}
+      \strng{authorfullhashraw}{1696cc5da74cfa805cfbe6dcbfea03f8}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Semtech Technical Documentation}
+      \field{number}{DS.SX1302.W.APP}
+      \field{title}{{SX1302} Long Range CoreCell Gateway Baseband Processor Datasheet}
+      \field{year}{2020}
+    \endentry
+  \enddatalist
+\endrefsection
+\endinput
+

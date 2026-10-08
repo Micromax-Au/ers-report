@@ -1,21 +1,82 @@
-\chapter{Source Code Listings}
+\chapter{Core Firmware \& Server Code Listings}
 \label{app:code}
 
-This appendix contains core implementation scripts for data processing and analysis.
+This appendix provides key production source code listings implemented during the functional prototype development phase.
 
-\begin{lstlisting}[language=Python, caption={Data Collection and Preprocessing Script}]
-import numpy as np
+\section{Client Communication \& Dual-Failover Logic (\texttt{ClientDeviceV2.py})}
+\begin{lstlisting}[language=Python, caption={Pico Client Multi-Modal Failover State Machine}]
+import time, struct, machine, network, socket
+from machine import Pin, SPI, I2C
 
-def calculate_metrics(data_array):
-    """
-    Calculate summary statistics for experimental readings.
-    """
-    mean_val = np.mean(data_array)
-    std_val = np.std(data_array)
-    return {"mean": mean_val, "std": std_val}
+class ClientDevice:
+    def __init__(self, dev_id=0x01):
+        self.device_id = dev_id
+        self.seq_num = 0
+        self.lora_retries_max = 2
+        # Initialize isolated hardware pins (Resolving GPIO15 conflict)
+        self.btn = Pin(15, Pin.IN, Pin.PULL_UP)
+        self.lora_reset = Pin(13, Pin.OUT)
+        self.buzzer = Pin(14, Pin.OUT)
+        self.wlan = network.WLAN(network.STA_IF)
 
-if __name__ == "__main__":
-    readings = np.array([12.4, 14.2, 11.9, 13.5, 12.8])
-    stats = calculate_metrics(readings)
-    print(f"Calculated Stats: {stats}")
+    def pack_payload(self, event_type, battery_pct):
+        # 4-Byte compact encoding: DevID (1B), Event/Batt (1B), SeqNum (2B)
+        batt_code = int((battery_pct / 100.0) * 15) & 0x0F
+        event_code = (event_type & 0x0F) << 4
+        byte1 = event_code | batt_code
+        payload = struct.pack(">BBH", self.device_id, byte1, self.seq_num)
+        self.seq_num = (self.seq_num + 1) % 65536
+        return payload
+
+    def send_emergency(self, event_type, battery_pct):
+        payload = self.pack_payload(event_type, battery_pct)
+        lora_success = False
+
+        # Attempt primary transmission via LoRaWAN
+        for attempt in range(self.lora_retries_max):
+            if self.transmit_lorawan(payload):
+                lora_success = True
+                print(f"[COMMS] LoRaWAN transmission success on attempt {attempt+1}")
+                break
+            time.sleep_ms(200)
+
+        # Autonomous failover to Wi-Fi if LoRaWAN is unavailable
+        if not lora_success:
+            print("[WARN] LoRaWAN unacknowledged. Triggering Wi-Fi failover...")
+            self.transmit_wifi_failover(payload)
+
+    def transmit_wifi_failover(self, payload):
+        self.wlan.active(True)
+        self.wlan.connect("Micromax_Safety_Net", "EmergencyKey2026")
+        timeout = 50
+        while not self.wlan.isconnected() and timeout > 0:
+            time.sleep_ms(100)
+            timeout -= 1
+
+        if self.wlan.isconnected():
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.sendto(payload, ("192.168.115.49", 5005))
+            s.close()
+            print("[COMMS] Wi-Fi UDP emergency packet dispatched successfully.")
 \end{lstlisting}
+
+\section{Discrete Kalman Filter RSSI Processor (\texttt{ble\_positioning\_4gw.py})}
+\begin{lstlisting}[language=Python, caption={Discrete 1D Kalman Filter Implementation for Gateway RSSI}]
+class KalmanRSSI:
+    def __init__(self, process_noise_q=0.008, measurement_noise_r=0.65):
+        self.q = process_noise_q  # Process variance
+        self.r = measurement_noise_r  # Measurement noise
+        self.x = -65.0  # Estimated state
+        self.p = 1.0   # Estimation error covariance
+        self.k = 0.0   # Kalman gain
+
+    def update(self, measurement):
+        # Time Update (Predict)
+        p_pred = self.p + self.q
+        # Measurement Update (Correct)
+        self.k = p_pred / (p_pred + self.r)
+        self.x = self.x + self.k * (measurement - self.x)
+        self.p = (1.0 - self.k) * p_pred
+        return self.x
+\end{lstlisting}
+

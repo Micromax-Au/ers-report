@@ -1,0 +1,17 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Commercial Lone-Worker Safety System Comparison}}{9}{table.caption.5}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Emergency Response System Technical Specifications}}{12}{table.caption.6}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Compact 4-Byte LoRaWAN Telemetry Payload Structure}}{14}{table.caption.7}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Kinematic Sensor Calibration Dataset for Fall Events vs. Daily Living Activities}}{17}{table.caption.8}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Empirical Gateway RSSI Attenuation Across Stepped Distances}}{18}{table.caption.9}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Indoor Positioning Performance Benchmark Across Localization Methods}}{19}{table.caption.10}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Emergency Response System Prototype Procurement \& Bill of Materials}}{21}{table.caption.11}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {B.1}{\ignorespaces BLE Gateway Network Topology Configurations}}{31}{table.caption.13}%
+\contentsline {table}{\numberline {B.2}{\ignorespaces Raspberry Pi Pico 2WH Wearable Client Pinout Configuration}}{32}{table.caption.14}%

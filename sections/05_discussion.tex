@@ -1,8 +1,66 @@
-\chapter{Discussion}
+\chapter{Discussion \& Commercialisation Strategy}
 \label{chap:discussion}
 
-\section{Analysis of Findings}
-Interpret the results presented in Chapter~\ref{chap:results}. Address key insights, trade-offs, and unexpected behavior observed during evaluation.
+\section{Analysis of Engineering Insights \& Trade-Offs}
 
-\section{Limitations}
-Discuss hardware, software, or environmental constraints encountered during testing.
+\subsection{Wireless Multi-Protocol Redundancy Synergy}
+The empirical results presented in Chapter~\ref{chap:results} validate the architectural premise that no single wireless communication protocol satisfies all industrial safety constraints \cite{wifi_lora_synergy}. While $2.4\,\text{GHz}$ Wi-Fi provides continuous session persistence and high data throughput, its high power consumption ($>100\,\text{mA}$) and severe attenuation through structural steel make it unsuitable as a sole emergency uplink. Conversely, sub-GHz LoRaWAN (AU915) offers unmatched penetration through heavy machinery and metallic vehicle chassis, but its low bandwidth and ALOHA duty-cycle restrictions preclude continuous real-time streaming.
+
+By establishing LoRaWAN as the primary low-power telemetry backbone with an automated, state-machine-driven failover to Wi-Fi upon packet acknowledgement timeout, the ERS achieves a dual-redundant communication framework. The $3.96\,\text{second}$ failover latency guarantees that in scenarios where a local LoRa concentrator is compromised or an RF channel suffers localized jamming, critical distress signals successfully reach the server via secondary LAN infrastructure.
+
+\subsection{Spatial Localization: The Coordinate vs. Room Zone Paradigm}
+A major engineering finding of this project is the practical limitation of continuous $(x, y)$ coordinate trilateration in cluttered industrial environments. As documented in Section~\ref{sec:gateway_rssi_comparison}, severe multipath reflections from metal sheet walls introduce non-monotonic RSSI gradients, causing raw trilateration algorithms to experience coordinate jumping errors exceeding $3.8\,\text{meters}$. While discrete Kalman filtering smooths transient jitter, it cannot completely resolve structural shadowing.
+
+Consequently, the strategic shift toward symbolic, discrete \textbf{Room Zone classification} supported by Mamdani Fuzzy Inference represents a major operational breakthrough. In mission-critical emergency dispatch, responders do not require floating-point Cartesian coordinates; rather, actionable linguistic location data (e.g., \textit{``Office 1''}, \textit{``Main Assembly Bay''}, \textit{``Spray Booth''}) is required to direct immediate physical intervention. Achieving a $94.8\%$ room classification accuracy validates this engineering trade-off.
+
+\subsection{Economic Viability: CAPEX vs. OPEX Subscription Models}
+Commercial lone-worker solutions (such as Blackline Safety and SoloProtect) impose mandatory monthly recurring SaaS fees ranging from $\$30$ to $\$60\,\text{AUD}$ per device \cite{lone_worker_safety_review}. For an industrial facility employing 20 workers, recurring operational expenditures exceed $\$7,200 - \$14,400\,\text{AUD}$ annually, representing a significant barrier for SMEs.
+
+In contrast, the Micromax ERS operates on a self-hosted, on-premises edge computing model. As established in the procurement analysis, a 20-node deployment carries an initial capital equipment cost of approximately $\$2,200\,\text{AUD}$ (amortized across gateways, server, and client nodes), with zero recurring software licensing fees. This delivers over an $80\%$ reduction in Total Cost of Ownership (TCO) over a three-year operating lifecycle, while ensuring complete organizational data privacy and on-premises audit compliance.
+
+\section{Environmental \& Technical Limitations}
+Despite the successful demonstration of the functional prototype, several technical constraints were identified during environmental testing:
+
+\begin{enumerate}
+    \item \textbf{LoRaWAN Concentrator Half-Duplex Constraints:} Standard industrial LoRa gateways (such as the SX1302 HAT) are half-duplex. When transmitting downlink acknowledgement packets (Class A RX1/RX2 windows), the concentrator cannot simultaneously receive uplinks from other nodes. In high-density emergency scenarios where multiple workers trigger simultaneous alarms, uncoordinated downlinks could increase uplink packet collision rates.
+    \item \textbf{BLE Signal Variance in Dynamic Environments:} Real-time physical movement of personnel, forklifts, and large metallic objects within the facility introduces dynamic RSSI fluctuations ($\pm 6\,\text{dBm}$). While fuzzy filtering mitigates boundary ambiguity, transition zones between adjacent open-plan bays remain sensitive to environmental noise.
+    \item \textbf{RP2040 Sleep Current Optimization:} In the current veroboard prototype, the RP2040 operates in active execution mode with periodic light-sleep states. Future commercial firmware must implement deep dormant states with hardware interrupt waking to extend the $1100\,\text{mAh}$ battery lifespan from $24.5\,\text{hours}$ to several weeks between charges.
+\end{enumerate}
+
+\section{60-Day Commercialisation Roadmap}
+Transitioning the Emergency Response System from the current lab-validated, functional prototype into a pilot-ready commercial product forms the core objective of the commercialisation phase (structured over a 60-day industrial productization lifecycle):
+
+\begin{enumerate}
+    \item \textbf{Hardware Consolidation (Custom 4-Layer PCB Design):}
+    \begin{itemize}
+        \item Replace the multi-board veroboard assembly (Pico + LoRa HAT + XIAO BLE + IMU) with a single, monolithic 4-layer Surface-Mount Technology (SMT) printed circuit board.
+        \item Integrate the RP2040 microcontroller directly alongside the Semtech SX1262 transceiver, Nordic nRF52840 SoC, MPU6050 (or high-accuracy LSM6DSOX), dynamic I2C fuel gauge, and an onboard USB Type-C battery charging controller.
+        \item Optimize RF trace routing, ground plane isolation, and matched $50\,\Omega$ impedance transmission lines for both the $915\,\text{MHz}$ LoRa and $2.4\,\text{GHz}$ BLE ceramic patch antennas.
+    \end{itemize}
+
+    \item \textbf{Mechanical Enclosure Design \& Tooling:}
+    \begin{itemize}
+        \item Design an ergonomic, ruggedized injection-molded enclosure fabricated from high-impact polycarbonate (PC/ABS) with an integrated silicone gasket, achieving an IP67 water and dust ingress protection rating.
+        \item Incorporate versatile industrial mounting accessories: heavy-duty spring-loaded belt clip, breakaway safety lanyard eyelet, and high-visibility emergency push-button with tactile shroud to prevent accidental actuation.
+    \end{itemize}
+
+    \item \textbf{Software Hardening \& Enterprise Integration:}
+    \begin{itemize}
+        \item Containerize the edge server backend using Docker to ensure seamless, single-command on-premises deployment.
+        \item Implement role-based access control (RBAC), TLS/SSL encryption across all internal MQTT/HTTP traffic, and RESTful API webhooks for integration with enterprise HR and access control systems (Active Directory, Gallagher, etc.).
+        \item Implement Over-the-Air (OTA) firmware update capabilities across the client fleet via secondary Wi-Fi connections.
+    \end{itemize}
+
+    \item \textbf{Pilot Deployment \& Manufacturing Handover:}
+    \begin{itemize}
+        \item Execute a 30-day live customer pilot deployment at representative industrial sites (e.g., Goldstream RV manufacturing plant), tracking uptime, false-alarm frequency, and operator feedback.
+        \item Prepare Design for Manufacturing (DFM) and Design for Test (DFT) documentation, automated bed-of-nails PCB test jigs, and regulatory compliance dossiers for Australian RCM (AS/NZS CISPR 32) certification.
+    \end{itemize}
+
+    \item \textbf{Strategic Drone Technology Synergy:}
+    \begin{itemize}
+        \item Conduct feasibility analysis on integrating autonomous unmanned aerial vehicles (UAVs / drones) with the ERS backend.
+        \item In large-scale outdoor industrial yards, agricultural holdings, or open manufacturing storage areas, an active emergency trigger from an ERS client node can autonomously dispatch a tethered/docked drone to the estimated GPS/zone coordinate, streaming live optical and thermal video directly to emergency response teams before first responders physically arrive on site.
+    \end{itemize}
+\end{enumerate}
+

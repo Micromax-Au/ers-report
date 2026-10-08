@@ -1,16 +1,68 @@
 \chapter{Introduction}
 \label{chap:introduction}
 
-\section{Problem Statement}
-Describe the core engineering problem, context, and motivation here. Citations can be added naturally like this \cite{sample_ieee_article}.
+\section{Problem Statement \& Motivation}
+In modern industrial, manufacturing, healthcare, and logistics facilities, ensuring the safety of personnel is a vital operational and legal priority. Organizations are mandated under statutory Work Health and Safety (WHS) frameworks---such as the Safe Work Australia Model Code of Practice for Remote or Isolated Work \cite{safework2020} and international standard ISO 45001 \cite{iso45001}---to provide effective communication systems and rapid emergency response mechanisms for workers. This duty of care is particularly acute for ``lone workers'' and isolated staff members who operate without direct or close supervision, often in acoustically shielded or physically compartmentalized industrial environments.
 
-\section{Project Scope \& Objectives}
-Outline what is within scope and out of scope for this technical report.
+A representative operational case study is provided by manufacturing facilities such as Goldstream RV (Pakenham, Victoria). In this single-level, U-shaped industrial manufacturing plant constructed of heavy steel sheet over structural framework, several critical hazard scenarios routinely manifest:
+\begin{enumerate}
+    \item \textbf{Isolated Personnel Incapacitation:} Assembly technicians frequently operate independently inside enclosed recreational vehicles (RVs) for hours at a time. In the event of an acute medical collapse, fall, or traumatic injury, an incapacitated worker may remain undetected until end-of-day site closure.
+    \item \textbf{Evacuation Unaccountability:} During facility-wide emergencies (such as fires or chemical spills), independent personnel working inside acoustically insulated cabins or remote workshops may fail to hear building sirens. Safety wardens are forced to conduct high-risk physical sweeps across complex layouts without knowing real-time worker locations.
+    \item \textbf{Irregular Shifts \& Contractor Tracking:} Staff working overtime or irregular weekend shifts may be the sole occupants of large facility sectors. Furthermore, visiting contractors and transient maintenance personnel often operate outside standard automated payroll/bundy-clock systems, leading to hazardous discrepancies in real-time site occupancy records.
+\end{enumerate}
+
+Existing commercial lone-worker safety solutions predominantly rely on standalone cellular wearables tethered to proprietary, recurring Software-as-a-Service (SaaS) subscription models (e.g., Blackline Safety, SoloProtect) \cite{lone_worker_safety_review}. These systems present severe drawbacks for industrial deployment:
+\begin{itemize}
+    \item \textbf{Prohibitive Operating Expenditures:} Cumulative annual per-device subscription fees create substantial financial friction for small-to-medium enterprises (SMEs) operating on fixed capital expenditure (CAPEX) cycles.
+    \item \textbf{Cellular Dead Zones \& Penetration Loss:} Industrial facilities characterized by reinforced concrete, metallic cladding, and internal machinery suffer from significant RF attenuation, rendering public cellular networks unreliable indoors.
+    \item \textbf{Lack of Integrated Physical Infrastructure:} Commercial wearables typically operate as isolated signaling beacons without direct hardware hooks into local facility infrastructure (e.g., automated site evacuation sirens, physical dry-contact relays, or localized zoning maps).
+\end{itemize}
+
+Consequently, there is an urgent engineering imperative for an on-premises, dual-redundant, subscription-free Emergency Response System (ERS) that unifies wearable biometric/kinematic sensing, low-power long-range wireless telemetry, real-time indoor positioning, and automated multi-channel facility dispatch.
+
+\section{Project Background \& Developmental Trajectory}
+The development of the Micromax Emergency Response System has advanced across three sequential phases, evolving from an exploratory academic capstone project into a commercially viable industrial safety platform:
 
 \begin{enumerate}
-    \item Objective 1: Detailed specification.
-    \item Objective 2: System design and validation.
+    \item \textbf{Phase 1 --- Academic Proof-of-Concept (ECTE351):} Initiated as an engineering capstone design project at the University of Wollongong in collaboration with Micromax Technology (Team 11), this phase established baseline feasibility. It demonstrated wearable fall detection via a 6-axis inertial measurement unit (IMU), basic cellular SMS notifications, and a conceptual HTML monitoring dashboard.
+    \item \textbf{Phase 2 --- Functional Prototype Engineering (ECTE399 R\&D):} Conducted as an extensive Research and Development internship at Micromax Technology under engineering mentorship, this phase transitioned the system from a breadboard concept to a deployable, multi-node functional prototype. Major engineering milestones achieved include:
+    \begin{itemize}
+        \item Implementation of a dual-redundant wireless communication architecture coupling primary LoRaWAN (AU915) long-range telemetry with automated fallback to local IEEE 802.11 Wi-Fi.
+        \item Deployment of an indoor Real-Time Location System (RTLS) utilizing Bluetooth Low Energy (BLE) gateway infrastructure, RSSI path-loss filtering (Kalman filtering), and symbolic Room Zone classification.
+        \item Development of multi-modal client emergency logic (personal panic vs. mass facility emergency) and an MPU6050 fall detection algorithm with an audible false-alarm cancellation grace window.
+        \item Engineering of a centralized Raspberry Pi 5 edge server hosting an SQLite relational database, multi-channel dispatch engine (SMS, Email, audio sirens, dry-contact hardware relays), and a web-based floor plan zoning interface.
+        \item Power budget characterization and Uninterruptible Power Supply (UPS) power-sequencing integration ensuring $>9.8$~hours of autonomous server survivability and full-shift wearable endurance.
+    \end{itemize}
+    \item \textbf{Phase 3 --- Commercialisation \& Product Refinement:} The ongoing industrialisation phase focuses on transforming the lab-tested prototype into a pilot-ready, ruggedized commercial product. This encompasses custom 4-layer PCB design (integrating RP2040 processing, LoRa transceivers, and BLE beaconing into an ergonomic wearable form factor), IP-rated mechanical enclosure tooling, manufacturing handover documentation, and strategic scoping for autonomous drone-assisted facility inspection.
+\end{enumerate}
+
+\section{Project Scope \& Core Engineering Objectives}
+This technical report documents the complete systems engineering design, empirical validation, and commercialisation pathway of the Micromax Emergency Response System. The primary engineering objectives addressed in this work are:
+
+\begin{enumerate}
+    \item \textbf{Objective 1: Multi-Modal Active and Passive Emergency Detection} \\
+    Design, calibrate, and validate embedded firmware on the client wearable capable of differentiating between deliberate Personal Emergencies (press-and-hold), facility-wide Mass Emergencies (rapid multi-click burst), and passive traumatic falls (IMU acceleration/gyroscope thresholding with false-alarm cancellation).
+    
+    \item \textbf{Objective 2: Fail-Safe Dual-Redundant Wireless Telemetry} \\
+    Formulate and implement a communication protocol stack prioritizing low-power, sub-gigahertz LoRaWAN transmission for reliable penetration through industrial steel structures, coupled with autonomous failover to local Wi-Fi upon packet acknowledgement failure.
+    
+    \item \textbf{Objective 3: Robust Real-Time Indoor Localization} \\
+    Evaluate and deploy a multi-gateway BLE RSSI tracking network. Analyze trilateration, centroid estimation, Kalman filtering, and fuzzy logic techniques to achieve high-confidence room-level zoning on interactive facility floor plans.
+    
+    \item \textbf{Objective 4: Centralized Edge Telemetry, Automation \& Audit Logging} \\
+    Construct an edge computing server environment that translates compact binary radio payloads, manages dynamic user/device allocations, coordinates multi-channel dispatch (cellular SMS, SMTP email, acoustic alarms, industrial relay outputs), and maintains tamper-evident audit logs.
+    
+    \item \textbf{Objective 5: Commercial Viability, DFM \& Strategic Scalability} \\
+    Establish a comprehensive Bill of Materials (BOM), analyze system power budgets under real-world discharge profiles, identify hardware failure modes, and delineate a concrete manufacturing and commercialisation roadmap.
 \end{enumerate}
 
 \section{Report Organization}
-This report is organized as follows: Chapter~\ref{chap:background} presents background literature, Chapter~\ref{chap:methodology} detail the engineering methodology, Chapter~\ref{chap:results} presents experimental findings, followed by discussion and conclusion.
+The remainder of this report is organized as follows:
+\begin{itemize}
+    \item \textbf{Chapter~\ref{chap:background} (Background \& Literature Review):} Details the mathematical foundations of kinematic fall detection, RF path-loss propagation, Kalman filter state estimation, fuzzy inference systems, LoRaWAN network dynamics, and relevant occupational health and safety standards.
+    \item \textbf{Chapter~\ref{chap:methodology} (System Architecture \& Methodology):} Presents the comprehensive multi-tier hardware, embedded firmware, communication protocol, and server software architectures, including circuit-level design and web dashboard workflows.
+    \item \textbf{Chapter~\ref{chap:results} (Results \& Performance Analysis):} Provides empirical validation data, including fall detection calibration matrices, BLE gateway attenuation profiles, indoor localization accuracy benchmarks, battery discharge kinetics, server UPS reliability metrics, and the final Bill of Materials.
+    \item \textbf{Chapter~\ref{chap:discussion} (Discussion):} Evaluates architectural trade-offs, industrial deployment challenges within metallic environments, comparison against subscription models, and outlines the commercialisation roadmap.
+    \item \textbf{Chapter~\ref{chap:conclusion} (Conclusion \& Future Work):} Summarizes major engineering achievements, verifies deliverable compliance, and outlines future technical directions including edge-AI and drone integration.
+    \item \textbf{Appendices:} Contains critical firmware source code listings, packet parsing scripts, database schemas, and complete procurement datasets.
+\end{itemize}

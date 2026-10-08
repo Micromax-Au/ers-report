@@ -1,35 +1,160 @@
-\chapter{System Architecture \& Methodology}
+\chapter{System Architecture \& Engineering Methodology}
 \label{chap:methodology}
 
-\section{System Overview}
-Describe the overall architecture or workflow of the system.
+\section{System Architecture Overview}
+The Micromax Emergency Response System is architected as a distributed, four-tier Internet of Things (IoT) edge-processing platform designed for mission-critical workplace safety. As illustrated in the block topology, the system comprises:
+\begin{enumerate}
+    \item \textbf{Wearable Client Nodes:} Microcontroller-driven wearable safety tags equipped with multi-modal emergency triggering, 6-DOF inertial fall sensing, dual-band wireless telemetry (LoRaWAN / Wi-Fi), and periodic BLE location beaconing.
+    \item \textbf{Ingress Gateway Infrastructure:} A dual-path gateway array consisting of an 8-channel SX1302/SX1303 LoRaWAN concentrator for telemetry packet reception and a network of distributed BLE-to-Wi-Fi/Ethernet gateways (Minew G1 / Mokosmart MKGW3) for RSSI harvesting.
+    \item \textbf{Centralized Edge Processing Server:} A dedicated Raspberry Pi 5 unit hosting a multithreaded Python backend, local UDP packet forwarder, MQTT message broker, SQLite relational database, and real-time positioning algorithms.
+    \item \textbf{Automated Notification \& Dispatch Layer:} A multi-channel alert engine interfacing with external cellular SMS gateways (Twilio API), SMTP mail relays, local acoustic annunciators, and physical dry-contact relays for facility evacuation sirens.
+\end{enumerate}
 
-% Example Figure Inclusion (Uncomment and update when an image is placed in figures/)
-% \begin{figure}[htbp]
-%     \centering
-%     \includegraphics[width=0.8\textwidth]{system_architecture.png}
-%     \caption{System Architecture Diagram.}
-%     \label{fig:system_architecture}
-% \end{figure}
+\section{Hardware Design \& Component Selection}
 
-\section{Design Specifications}
-Table~\ref{tab:sample_specs} outlines the system specifications and operating parameters.
+\subsection{Wearable Client Device Hardware}
+The client node is designed to balance low power consumption, processing capability, sensor fidelity, and compact physical dimensions. The hardware architecture incorporates the following integrated modules:
+
+\begin{itemize}
+    \item \textbf{Core Microcontroller (Raspberry Pi Pico 2WH):} Powered by the RP2040 dual-core ARM Cortex-M0+ processor operating at $133\,\text{MHz}$ with $264\,\text{KB}$ of on-chip SRAM and $2\,\text{MB}$ of onboard QSPI flash memory \cite{rp2040_datasheet}. The onboard CYW43439 wireless chip provides secondary $2.4\,\text{GHz}$ IEEE 802.11 b/g/n Wi-Fi connectivity.
+    \item \textbf{LoRaWAN Transceiver Module (Waveshare Pico LoRa HAT):} Integrates a Semtech SX1262 sub-GHz RF transceiver tuned for the Australian AU915-928~MHz Industrial, Scientific, and Medical (ISM) band. It interfaces with the RP2040 via high-speed SPI with dedicated interrupt lines (DIO1) and an external $915\,\text{MHz}$ RP-SMA dipole antenna.
+    \item \textbf{Dedicated BLE Beaconing Module (Seeed Studio XIAO nRF52840):} Featuring a Nordic nRF52840 32-bit ARM Cortex-M4F processor with Bluetooth 5.0 Low Energy capability. The module continuously broadcasts non-connectable advertising beacons (iBeacon standard, 100~ms interval, $0\,\text{dBm}$ Tx power) for gateway RSSI capture without placing computational overhead on the primary RP2040 processor.
+    \item \textbf{Inertial Measurement Unit (InvenSense MPU6050):} A 6-DOF sensor combining a 3-axis MEMS accelerometer ($\pm 8g$ range, $4096\,\text{LSB}/g$) and a 3-axis MEMS gyroscope ($\pm 1000^\circ/\text{s}$ range, $32.8\,\text{LSB}/(^\circ/\text{s})$) connected via I2C at $400\,\text{kHz}$ (Fast Mode) on GPIO4 (SDA) and GPIO5 (SCL) \cite{inven_mpu6050}.
+    \item \textbf{Power Management \& Battery Subsystem:} A single-cell rechargeable Lithium-Polymer (LiPo) battery rated at $3.7\,\text{V}$ nominal, $1100\,\text{mAh}$ capacity ($4.07\,\text{Wh}$), coupled with a Waveshare Pico UPS Module (Type B) incorporating a Texas Instruments step-up boost converter ($5.0\,\text{V}$ rail) and an I2C fuel gauge for dynamic cell voltage monitoring.
+    \item \textbf{User Interface \& Physical Actuation:} A high-tactile snap-action push button with mechanical debouncing, a high-intensity dual-color status LED (green for operational status, pulsing red for emergency trigger), and an active piezoelectric acoustic buzzer ($85\,\text{dB}$ @ $10\,\text{cm}$) for pre-alert audible warnings.
+\end{itemize}
+
+\subsection{Central Edge Server \& Gateway Layer}
+\begin{itemize}
+    \item \textbf{Central Edge Server (Raspberry Pi 5):} Features a Broadcom BCM2712 quad-core ARM Cortex-A76 processor @ $2.4\,\text{GHz}$, $4\,\text{GB}$ LPDDR4X SDRAM, Gigabit Ethernet, and the custom RP1 I/O controller handling low-level peripherals \cite{rpi5_datasheet}.
+    \item \textbf{LoRaWAN Concentrator HAT (Waveshare SX1302/SX1303 915M):} An industrial 8-channel gateway baseband processor capable of simultaneous multi-SF packet demodulation across 8 frequency channels in the AU915 band (FSB 2, $916.8-918.2\,\text{MHz}$), providing a receiver sensitivity down to $-141\,\text{dBm}$ \cite{semtech_sx1302}.
+    \item \textbf{Distributed BLE Gateways:} Minew G1 BLE-to-Wi-Fi/Ethernet gateways and Mokosmart MKGW3 PoE BLE gateways deployed in fixed ceiling/wall locations. The gateways continuously scan 2.4~GHz BLE advertising channels (37, 38, 39), extract transmitter MAC addresses, parse payload UUIDs, and forward structured JSON payloads containing raw RSSI values to the server's central MQTT broker over local LAN.
+\end{itemize}
+
+Table~\ref{tab:system_specs} summarizes the operating parameters of the ERS infrastructure.
 
 \begin{table}[htbp]
     \centering
-    \caption{System Operating Specifications}
-    \label{tab:sample_specs}
-    \begin{tabularx}{0.9\textwidth}{l X c}
+    \caption{Emergency Response System Technical Specifications}
+    \label{tab:system_specs}
+    \begin{tabularx}{\textwidth}{l X c}
         \toprule
-        \textbf{Parameter} & \textbf{Description} & \textbf{Nominal Value} \\
+        \textbf{Subsystem / Parameter} & \textbf{Technical Specification / Description} & \textbf{Nominal Value} \\
         \midrule
-        Voltage & Input supply voltage range & 12--24 V DC \\
-        Frequency & Operating clock frequency & 100 MHz \\
-        Efficiency & Peak energy efficiency & 94.5\% \\
-        Operating Temp & Safe environmental range & -20 to +70 $^\circ$C \\
+        \textbf{Client Microcontroller} & Raspberry Pi Pico 2WH (RP2040, Dual Cortex-M0+) & $133\,\text{MHz}, 264\,\text{KB}$ SRAM \\
+        \textbf{Primary Wireless Radio} & Semtech SX1262 LoRa Transceiver (SPI) & $915\,\text{MHz}$ AU915 Band \\
+        \textbf{Secondary Wireless Radio}& Infineon CYW43439 Wi-Fi (IEEE 802.11 b/g/n) & $2.4\,\text{GHz}$, TCP/UDP Sockets \\
+        \textbf{Location Beacon Radio} & Nordic nRF52840 BLE 5.0 (Advertising Mode) & $2.4\,\text{GHz}$, $100\,\text{ms}$ Interval \\
+        \textbf{Inertial Sensor} & InvenSense MPU6050 6-DOF IMU (I2C) & $\pm 8g, \pm 1000^\circ/\text{s}, 50\,\text{Hz}$ \\
+        \textbf{Client Battery Cell} & Rechargeable LiPo 1S Pouch Cell & $3.7\,\text{V}, 1100\,\text{mAh}$ ($4.07\,\text{Wh}$) \\
+        \textbf{Client Power Budget} & Active Beaconing + Idle Listen Current & $42\,\text{mA}$ Avg ($>24\,\text{h}$ runtime) \\
+        \textbf{Server Platform} & Raspberry Pi 5 Model B (Quad Cortex-A76) & $2.4\,\text{GHz}, 4\,\text{GB}$ RAM \\
+        \textbf{LoRaWAN Concentrator} & Semtech SX1302/SX1303 8-Channel HAT (SPI) & $8\times \text{Uplink}, -141\,\text{dBm}$ Sens. \\
+        \textbf{Gateway Power Supply} & Power over Ethernet (PoE IEEE 802.3af) / 5V DC & $5\,\text{V} / 1\,\text{A}$ \\
+        \textbf{Server UPS Battery} & Waveshare Pi 5 UPS Hat (2$\times$ 18650 Li-ion) & $7.4\,\text{V}, 5000\,\text{mAh}$ ($>9.8\,\text{h}$ backup) \\
+        \textbf{Operating Temperature} & Industrial Ambient Temperature Range & $-10^\circ\text{C to } +55^\circ\text{C}$ \\
         \bottomrule
     \end{tabularx}
 \end{table}
 
-\section{Experimental Setup}
-Detail the testing environment, instrumentation, and data collection procedures.
+\section{Firmware Architecture \& Embedded Logic}
+
+\subsection{Multi-Modal Button Triggering State Machine}
+To eliminate false alarms while enabling intuitive single-button operation, the client firmware implements a deterministic state machine distinguishing between two primary user-initiated alert classes:
+\begin{enumerate}
+    \item \textbf{Personal Emergency (Individual Distress):} Activated by a continuous, sustained button press for $T_{\text{hold}} \ge 2.0\,\text{seconds}$. This triggers a localized distress alert routed specifically to assigned safety supervisors without sounding facility-wide sirens.
+    \item \textbf{Mass Facility Emergency (Building Evacuation):} Activated by a rapid sequence of $N_{\text{press}} = 5$ consecutive button presses completed within a total window of $T_{\text{burst}} \le 3.0\,\text{seconds}$. This triggers a critical building evacuation workflow, actuating the central siren and notifying all site personnel.
+\end{enumerate}
+
+\subsection{Hardware Conflict Identification \& Resolution (GPIO15 Debug)}
+During initial prototype integration, a critical hardware bug was observed: while Personal Emergency alerts transmitted reliably over LoRaWAN, Mass Emergency triggers consistently failed over LoRa and were prematurely forced into Wi-Fi failover. 
+
+Engineering investigation revealed that GPIO15 on the RP2040 had been assigned both as the external push-button interrupt input and the hardware active-low reset pin (\texttt{NRESET}) of the SX1262 LoRa module. When a user executed 5 rapid button presses, GPIO15 was repeatedly pulled low and released, subjecting the SX1262 to consecutive hardware resets during SPI initialization. This corrupted the internal radio state machine and caused LoRa transmission timeouts. The issue was resolved by remapping the LoRa \texttt{NRESET} line to an isolated GPIO (GPIO13) and adding a 100~nF RC hardware debounce circuit to the button input on GPIO15.
+
+\subsection{Kinematic Fall Detection Algorithm with Cancellation Grace Window}
+The MPU6050 driver continuously samples acceleration and angular rate registers into a circular buffer at a frequency of $50\,\text{Hz}$ ($\Delta t = 20\,\text{ms}$). The algorithm operates across four sequential states:
+
+\begin{enumerate}
+    \item \textbf{State 0 (Continuous Monitoring):} Calculates $A_{\text{total}}(t)$ via Equation~\eqref{eq:avm}. If $A_{\text{total}}(t) < 0.5g$ (freefall detected) followed within $300\,\text{ms}$ by $A_{\text{total}}(t) \ge 2.8g$ (impact shock), the state machine advances to State 1.
+    \item \textbf{State 1 (Orientation \& Inactivity Verification):} The microcontroller monitors sensor variance for $1.5\,\text{seconds}$. If post-impact dynamic variance $\sigma_A^2 < 0.05g^2$ and tilt angle $|\theta_{\text{tilt}}| > 60^\circ$ (prostration confirmed), a fall event is registered, transitioning to State 2.
+    \item \textbf{State 2 (Cancellation Grace Window):} To prevent false alarms arising from dropped devices or heavy tool placement, the client initiates a $10.0\,\text{second}$ countdown. During this window, the local buzzer emits an intermittent high-pitch warning beep ($2\,\text{Hz}$) and the status LED flashes red. If the user presses the button during this 10-second period, the alert is cancelled, logged locally as a false positive, and normal monitoring resumes.
+    \item \textbf{State 3 (Distress Dispatch):} If the countdown expires without user cancellation, the firmware compiles a high-priority distress packet and passes it to the transmission subsystem.
+\end{enumerate}
+
+\subsection{Compact 4-Byte LoRaWAN Binary Payload Design}
+To conform to LoRaWAN regional duty cycle regulations (maximum 1\% airtime in ISM bands) and minimize packet collision probability, all telemetry is serialized into an ultra-compact 4-byte binary structure, detailed in Table~\ref{tab:lora_payload}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Compact 4-Byte LoRaWAN Telemetry Payload Structure}
+    \label{tab:lora_payload}
+    \begin{tabularx}{\textwidth}{c c c X}
+        \toprule
+        \textbf{Byte Index} & \textbf{Bit Field} & \textbf{Data Type} & \textbf{Description \& Bit Mapping} \\
+        \midrule
+        \textbf{Byte 0} & Bits 7--0 & \texttt{uint8\_t} & \textbf{Client Device ID:} Unique numerical identifier ($0\times 01 - 0\times\text{FF}$, supporting 255 local nodes). \\
+        \midrule
+        \multirow{2}{*}{\textbf{Byte 1}} & Bits 7--4 & \texttt{uint4\_t} & \textbf{Event Type Code:} \newline $0\times 1$: Personal Emergency, $0\times 2$: Mass Evacuation, \newline $0\times 3$: Traumatic Fall, $0\times 4$: Low Battery Warning, \newline $0\times 0$: Periodic Heartbeat / Keepalive. \\
+        \cmidrule{2-4}
+        & Bits 3--0 & \texttt{uint4\_t} & \textbf{Battery Charge State:} Scaled $0-15$ representing $0\% - 100\%$ capacity ($6.67\%$ quantization step). \\
+        \midrule
+        \textbf{Byte 2} & Bits 7--0 & \texttt{uint8\_t} & \textbf{Sequence Counter (High Byte):} Rolling transaction counter ($0-65535$) for packet deduplication. \\
+        \midrule
+        \textbf{Byte 3} & Bits 7--0 & \texttt{uint8\_t} & \textbf{Sequence Counter (Low Byte) \& Status Flags:} Includes acknowledge bit and failover status flags. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\subsection{Autonomous LoRaWAN-to-Wi-Fi Failover State Machine}
+The client communication subsystem implements a dual-link failover engine (encapsulated in \texttt{ClientDeviceV2.py}):
+\begin{enumerate}
+    \item When an emergency event triggers, the client formats the 4-byte payload and transmits it over LoRaWAN (AU915, SF7, $125\,\text{kHz}$ bandwidth).
+    \item The client opens an RX1 receive window ($1.0\,\text{s}$ post-transmission) awaiting a server acknowledgement (ACK) frame.
+    \item If no ACK is received, the client executes a second LoRa retry ($N_{\text{retry}} = 2$).
+    \item If the secondary LoRa transmission times out (indicating RF occlusion, concentrator outage, or deep steel attenuation), the microcontroller immediately activates the onboard CYW43439 Wi-Fi radio, connects to the local emergency SSID, and transmits the alert payload via a raw TCP/UDP socket directly to the server IP on port 5005.
+\end{enumerate}
+
+\section{Server Architecture, Database Schema \& Dispatch Pipeline}
+
+\subsection{Edge Server Multithreaded Software Architecture}
+The Raspberry Pi 5 runs a custom Linux service suite orchestrating concurrent network protocols:
+\begin{itemize}
+    \item \textbf{LoRa Packet Forwarder (\texttt{lora\_pkt\_fwd}):} Interfaces with the SX1302 concentrator over SPI, receiving raw radio packets and forwarding them via local UDP socket to \texttt{local\_lora\_udp\_server.py}.
+    \item \textbf{MQTT Broker (Eclipse Mosquitto):} Listening on \texttt{192.168.115.49:1883}, receiving JSON RSSI streams from the distributed Minew G1 and Mokosmart gateways.
+    \item \textbf{Core Server Engine (\texttt{server.py}):} Implements multi-threading to parse incoming LoRa and Wi-Fi packets, query the database, calculate node positions, and trigger notification workflows.
+    \item \textbf{Web Application (Flask / WSGI):} Serves the responsive management dashboard on port 5000.
+\end{itemize}
+
+\subsection{SQLite Relational Database Schema}
+The persistence layer utilizes SQLite3 to ensure zero-maintenance, zero-configuration local data logging. The relational structure is defined across four core tables:
+\begin{enumerate}
+    \item \texttt{staff}: Stores \texttt{staff\_id} (PRIMARY KEY), \texttt{full\_name}, \texttt{email}, \texttt{phone\_number}, \texttt{department}, \texttt{special\_medical\_notes}, and \texttt{is\_active}.
+    \item \texttt{devices}: Stores \texttt{device\_id} (PRIMARY KEY), \texttt{lora\_deveui}, \texttt{ble\_mac\_address}, \texttt{assigned\_staff\_id} (FOREIGN KEY), \texttt{battery\_percentage}, and \texttt{last\_heartbeat}.
+    \item \texttt{room\_zones}: Stores \texttt{zone\_id} (PRIMARY KEY), \texttt{zone\_name}, \texttt{x\_min}, \texttt{y\_min}, \texttt{x\_max}, \texttt{y\_max} (defining bounding polygon coordinates on the floor plan), and \texttt{floor\_level}.
+    \item \texttt{incident\_logs}: Stores \texttt{log\_id} (PRIMARY KEY), \texttt{timestamp}, \texttt{device\_id}, \texttt{event\_type}, \texttt{raw\_rssi\_data}, \texttt{estimated\_x}, \texttt{estimated\_y}, \texttt{resolved\_room\_name}, \texttt{dispatch\_status}, and \texttt{is\_drill}.
+\end{enumerate}
+
+\subsection{Multi-Channel Notification \& Actuation Pipeline}
+Upon receipt of a validated emergency packet, \texttt{server.py} instantiates parallel asynchronous dispatch workers:
+\begin{itemize}
+    \item \textbf{Cellular SMS Dispatch (Twilio API):} Transmits formatted SMS alerts to configured emergency response numbers containing worker name, event classification, timestamp, and resolved location (e.g., \textit{``EMERGENCY: Fall Detected for John Doe at 14:22:05. Location: Office 1 (Boardroom Zone). Immediate assistance required.''})
+    \item \textbf{SMTP Email Dispatch:} Generates MIME-formatted HTML emails containing detailed incident summaries, worker medical notes, and floor plan coordinate links.
+    \item \textbf{Hardware Siren \& Relay Output:} Asserts GPIO26 on the Raspberry Pi 5, closing an optocoupled industrial dry-contact relay ($250\,\text{V AC} / 10\,\text{A}$) connected to building evacuation sirens and strobes. A dedicated \textit{``Acknowledge / Silence Siren''} button on the web GUI de-asserts the relay once safety wardens verify site control.
+\end{itemize}
+
+\subsection{Dynamic Web Management GUI \& Interactive Floor Plan Mapper}
+The web interface provides real-time facility visibility split across four dedicated modules:
+\begin{enumerate}
+    \item \textbf{Live Dashboard:} Displays active worker cards, battery telemetry, real-time connectivity status (Green = Normal, Red = Alarm, Grey = Offline), and dynamic SVG floor plan markers.
+    \item \textbf{Interactive Room Zone Mapper:} Allows administrators to upload high-resolution facility floor plans (PNG/JPEG), calibrate pixel-to-meter scaling by setting known anchor dimensions, place virtual gateway coordinates, and define Room Zones by clicking two bounding corners on the canvas.
+    \item \textbf{Staff \& Device Allocation:} Facilitates assignment of wearable hardware to permanent staff or temporary visitors with automatic data purge timers upon visitor check-out.
+    \item \textbf{Audit Logging \& Evacuation Drill Mode:} Provides CSV log exporting for compliance audits and an evacuation drill mode that executes full dispatch workflows while tagging database entries as \texttt{is\_drill = 1} to prevent false regulatory reporting.
+\end{enumerate}
+
+\section{Experimental Testbed \& Calibration Methodology}
+Empirical evaluation was conducted within the Micromax Technology facility (5 Orangegrove Ave, Unanderra, NSW). The testing methodology encompassed:
+\begin{itemize}
+    \item \textbf{Fall Detection Calibration:} Controlled drop trials onto a high-density safety mattress across 5 distinct impact angles (forward collapse, backward fall, lateral left/right, and vertical collapse) compared against 5 Activities of Daily Living (ADL: brisk walking, sitting rapidly, bending, stair descent, and prayer prostration).
+    \item \textbf{BLE Gateway Range \& Attenuation Profiling:} Stepped distance measurements ($0\,\text{m}$ to $7\,\text{m}$) across open-air, drywall, and structural steel partitions comparing the Minew G1, Mokosmart MKGW3, and Mokosmart LW003-B.
+    \item \textbf{Power \& UPS Endurance Testing:} Automated voltage and current discharge profiling under active $100\,\text{ms}$ BLE advertising and continuous server workloads down to hardware cutoff.
+\end{itemize}
